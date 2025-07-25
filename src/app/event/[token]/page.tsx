@@ -193,44 +193,42 @@ export default function EventPage({ params }: EventPageProps) {
       </Card>
 
       {/* Filtr sekcí */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-4 gap-2">
-            <Button
-              variant={visibleSections.participants && visibleSections.transport && visibleSections.inventory ? "default" : "outline"}
-              size="sm"
-              onClick={showAll}
-              className="w-full"
-            >
-              Všechno
-            </Button>
-            <Button
-              variant={visibleSections.participants ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleSection('participants')}
-              className="w-full"
-            >
-              👥 Účastníci
-            </Button>
-            <Button
-              variant={visibleSections.transport ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleSection('transport')}
-              className="w-full"
-            >
-              🚗 Doprava
-            </Button>
-            <Button
-              variant={visibleSections.inventory ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleSection('inventory')}
-              className="w-full"
-            >
-              📦 Inventář
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="mb-6">
+        <div className="grid grid-cols-4 gap-2">
+          <Button
+            variant={visibleSections.participants && visibleSections.transport && visibleSections.inventory ? "default" : "outline"}
+            size="sm"
+            onClick={showAll}
+            className="w-full"
+          >
+            Všechno
+          </Button>
+          <Button
+            variant={visibleSections.participants ? "default" : "outline"}
+            size="sm"
+            onClick={() => toggleSection('participants')}
+            className="w-full"
+          >
+            👥 Účastníci
+          </Button>
+          <Button
+            variant={visibleSections.transport ? "default" : "outline"}
+            size="sm"
+            onClick={() => toggleSection('transport')}
+            className="w-full"
+          >
+            🚗 Doprava
+          </Button>
+          <Button
+            variant={visibleSections.inventory ? "default" : "outline"}
+            size="sm"
+            onClick={() => toggleSection('inventory')}
+            className="w-full"
+          >
+            📦 Inventář
+          </Button>
+        </div>
+      </div>
 
       {/* Sekce - zobrazují se podle filtru */}
       {visibleSections.participants && visibleSections.transport && (
