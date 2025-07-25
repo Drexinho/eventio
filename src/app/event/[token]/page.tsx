@@ -231,29 +231,6 @@ export default function EventPage({ params }: EventPageProps) {
       </div>
 
       {/* Sekce - zobrazují se podle filtru */}
-      {visibleSections.participants && visibleSections.transport && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {visibleSections.participants && (
-            <div>
-              <ParticipantsPanel eventToken={eventToken} />
-            </div>
-          )}
-          {visibleSections.transport && (
-            <div>
-              <TransportPanel eventToken={eventToken} />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Inventář - zobrazuje se samostatně pokud je vybraný */}
-      {visibleSections.inventory && !visibleSections.participants && !visibleSections.transport && (
-        <div className="mb-8">
-          <InventoryPanel eventToken={eventToken} />
-        </div>
-      )}
-
-      {/* Kombinované zobrazení */}
       {(visibleSections.participants || visibleSections.transport || visibleSections.inventory) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {visibleSections.participants && (
