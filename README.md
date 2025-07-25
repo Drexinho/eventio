@@ -1,120 +1,270 @@
-# EventPlanner - Soukromý plánovač událostí
+# 🎉 EventPlanner v1.0 - Stable Version
 
-Moderní webová aplikace pro soukromé plánování událostí s podporou více skupin a bezpečným přístupem přes unikátní odkazy nebo PIN kódy.
+## 📋 Přehled
 
-## 🚀 Funkce
+EventPlanner je kompletní aplikace pro správu událostí s možností sdílení přes token. Aplikace umožňuje správu účastníků, dopravy, inventáře a audit logů všech změn.
 
-- **Soukromé události** - Každá událost má unikátní odkaz nebo PIN kód
-- **Spolupráce v reálném čase** - Všichni s přístupem mohou editovat
-- **Správa účastníků** - Přidávání, editace a mazání účastníků
-- **Plánování dopravy** - Přiřazování účastníků k dopravě
-- **Inventář** - Seznam věcí, které si účastníci vezmou s sebou
-- **Audit log** - Historie všech změn
-- **Responsivní design** - Funguje na všech zařízeních
+## ✨ Funkce
 
-## 🛠️ Technologie
+### 🎯 Hlavní funkce
+- ✅ **Vytváření událostí** s tokenem pro sdílení
+- ✅ **Správa účastníků** (přidávání, editace, mazání)
+- ✅ **Správa dopravy** (přidávání, editace, mazání, přiřazování účastníků)
+- ✅ **Správa inventáře** (přidávání, editace, mazání, přiřazování účastníků)
+- ✅ **Audit logy** všech změn
+- ✅ **Editace hlavních informací** události
+- ✅ **Responsivní design** pro všechny zařízení
 
-- **Frontend**: Next.js 15 (App Router), TypeScript
-- **Styling**: Tailwind CSS, shadcn/ui
-- **Formuláře**: React Hook Form + Zod validace
-- **Databáze**: Supabase (PostgreSQL)
-- **Bezpečnost**: Row Level Security (RLS)
-- **Deployment**: Vercel
+### 🎨 UI/UX Funkce
+- ✅ **Single-page design** - vše na jedné stránce
+- ✅ **Grid layout** 2x2 pro hlavní sekce
+- ✅ **Dropdown formuláře** pro přidávání
+- ✅ **Inline editace** přímo pod položkami
+- ✅ **Adaptivní velikost tlačítek** podle délky textu
+- ✅ **Ikony** pro lepší orientaci
+- ✅ **Barevné indikátory** stavu (přiřazeno/nepřiřazeno)
 
-## 📦 Instalace
+## 🚀 Rychlé spuštění
 
+### Požadavky
+- Node.js 18+
+- PostgreSQL 13+
+
+### 1. Instalace
 ```bash
-# Klonování repository
-git clone <repository-url>
-cd event-planner
+# Klonování repozitáře
+git clone git@github.com:Drexinho/eventio.git
+cd eventio
 
 # Instalace závislostí
 npm install
+```
 
-# Nastavení environment proměnných
-cp .env.local.example .env.local
-# Upravte .env.local s vašimi Supabase údaji
+### 2. Databáze
+```bash
+# Spuštění PostgreSQL
+sudo systemctl start postgresql
 
-# Spuštění vývojového serveru
+# Vytvoření databáze a uživatele
+sudo -u postgres psql -c "CREATE USER eventplanner WITH PASSWORD 'your_password';"
+sudo -u postgres psql -c "CREATE DATABASE eventplanner_db OWNER eventplanner;"
+
+# Spuštění schématu
+psql -U eventplanner -d eventplanner_db -f postgresql-schema.sql
+```
+
+### 3. Konfigurace
+```bash
+# Vytvoření .env.local
+cat > .env.local << EOF
+DATABASE_URL=postgresql://eventplanner:your_password@localhost:5432/eventplanner_db
+EOF
+```
+
+### 4. Spuštění
+```bash
+# Development mode
 npm run dev
+
+# Testování
+curl http://localhost:3000/api/test-db
 ```
 
-## 🔧 Konfigurace
+## 📊 Databázová struktura
 
-### Environment proměnné
+### Tabulky
+- **`events`** - Události (název, popis, datum, cena, token)
+- **`participants`** - Účastníci (jméno, poznámky, zůstává celý čas)
+- **`transport`** - Doprava (typ, místa, čas, kapacita, cena, mezizastávky)
+- **`transport_assignments`** - Přiřazení účastníků k dopravě
+- **`inventory_items`** - Inventář (název, množství, přiřazení)
+- **`audit_logs`** - Audit logy všech změn
 
-Vytvořte soubor `.env.local`:
+## 🔧 API Endpoints
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+### Události
+- `GET /api/events/[token]` - Získat událost
+- `PUT /api/events/[token]` - Upravit událost
 
-### Supabase nastavení
+### Účastníci
+- `GET /api/events/[token]/participants` - Seznam účastníků
+- `POST /api/events/[token]/participants` - Přidat účastníka
+- `PUT /api/events/[token]/participants/[id]` - Upravit účastníka
+- `DELETE /api/events/[token]/participants/[id]` - Smazat účastníka
 
-1. Vytvořte projekt na [supabase.com](https://supabase.com)
-2. Spusťte SQL skript `supabase-schema.sql`
-3. Zkopírujte URL a API klíče do `.env.local`
+### Doprava
+- `GET /api/events/[token]/transport` - Seznam dopravy
+- `POST /api/events/[token]/transport` - Přidat dopravu
+- `PUT /api/events/[token]/transport/[id]` - Upravit dopravu
+- `DELETE /api/events/[token]/transport/[id]` - Smazat dopravu
+- `POST /api/events/[token]/transport/assign` - Přiřadit účastníka
+- `DELETE /api/events/[token]/transport/assign` - Odebrat účastníka
+
+### Inventář
+- `GET /api/events/[token]/inventory` - Seznam inventáře
+- `POST /api/events/[token]/inventory` - Přidat položku
+- `PUT /api/events/[token]/inventory/[id]` - Upravit položku
+- `DELETE /api/events/[token]/inventory/[id]` - Smazat položku
+
+### Audit logy
+- `GET /api/events/[token]/audit-logs` - Seznam audit logů
+
+## 🎯 Klíčové funkce
+
+### 1. Správa účastníků
+- ✅ **Přidávání** účastníků s jménem a poznámkami
+- ✅ **Editace** existujících účastníků
+- ✅ **Mazání** účastníků
+- ✅ **Indikace** zda zůstává celý čas
+- ✅ **Poznámky** pro každého účastníka
+
+### 2. Správa dopravy
+- ✅ **Přidávání** dopravy s detaily (typ, místa, čas, kapacita, cena)
+- ✅ **Editace** existující dopravy
+- ✅ **Mazání** dopravy
+- ✅ **Přiřazování/odebírání** účastníků
+- ✅ **Mezizastávky** s časem a poznámkami
+- ✅ **Výpočet ceny** na jednoho účastníka
+- ✅ **Poznámky** pro dopravu
+
+### 3. Správa inventáře
+- ✅ **Přidávání** položek s množstvím
+- ✅ **Editace** existujících položek
+- ✅ **Mazání** položek
+- ✅ **Přiřazování** účastníků k položkám
+- ✅ **Poznámky** pro položky
+
+### 4. Audit systém
+- ✅ **Logování** všech změn (INSERT, UPDATE, DELETE)
+- ✅ **Historie** s detaily změn
+- ✅ **Předchozí a nové hodnoty** v JSON formátu
+
+## 🎨 UI Komponenty
+
+### Layout
+- ✅ **Single-page design** - vše na jedné stránce
+- ✅ **Grid layout** 2x2 pro sekce (Participants+Transport, Inventory+Audit)
+- ✅ **Obrázek události** vpravo (60% velikost)
+- ✅ **Základní informace** vlevo (název, datum, popis, cena)
+
+### Formuláře
+- ✅ **Dropdown design** - skryté do kliknutí na +
+- ✅ **Inline editace** - formulář pod položkou
+- ✅ **Validace** s chybovými zprávami
+- ✅ **Automatické zavírání** po úspěšném přidání
+
+### Tlačítka a interakce
+- ✅ **Adaptivní velikost** podle délky textu
+- ✅ **Barevné indikátory** stavu (přiřazeno/nepřiřazeno)
+- ✅ **Ikony** pro lepší UX
+- ✅ **Potvrzovací dialogy** pro mazání
+
+## 🔧 Technické detaily
+
+### Frontend
+- ✅ **Next.js 15** s App Router
+- ✅ **TypeScript** pro typovou bezpečnost
+- ✅ **Tailwind CSS** pro styling
+- ✅ **React Hook Form** pro formuláře
+- ✅ **Zod** pro validaci
+
+### Backend
+- ✅ **PostgreSQL** databáze
+- ✅ **pg** Node.js klient
+- ✅ **Next.js API Routes**
+- ✅ **Audit triggers** v databázi
+
+### Deployment
+- ✅ **Lokální PostgreSQL** instance
+- ✅ **Environment variables** pro konfiguraci
+- ✅ **Error handling** na všech úrovních
 
 ## 🚀 Deployment
 
-### Vercel (doporučeno)
+### Lokální spuštění
+```bash
+npm run dev
+```
 
-1. Pushněte kód do GitHub repository
-2. Importujte projekt do Vercel
-3. Nastavte environment proměnné
-4. Deploy!
+### Produkční nasazení
+```bash
+# Build aplikace
+npm run build
 
-Více informací v [DEPLOYMENT.md](./DEPLOYMENT.md)
+# Spuštění s PM2
+npm install -g pm2
+pm2 start npm --name "eventplanner" -- start
+pm2 startup
+pm2 save
+```
 
-## 📱 Použití
+### Nginx konfigurace (volitelně)
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
 
-### Vytvoření události
-1. Jděte na `/create`
-2. Vyplňte informace o události
-3. Vyberte typ přístupu (odkaz nebo PIN)
-4. Získejte unikátní odkaz pro sdílení
+## 🎯 Výhody této verze
 
-### Připojení k události
-1. Jděte na `/join`
-2. Zadejte odkaz nebo PIN kód
-3. Začněte spolupracovat!
+### 1. Robustnost
+- ✅ **Kompletní CRUD** operace pro všechny entity
+- ✅ **Audit logging** všech změn
+- ✅ **Error handling** s uživatelskými zprávami
+- ✅ **Type safety** TypeScript
 
-### Správa události
-- **Účastníci**: Přidávejte a spravujte seznam účastníků
-- **Doprava**: Plánujte dopravu a přiřazujte účastníky
-- **Inventář**: Spravujte seznam věcí
-- **Historie**: Sledujte všechny změny
+### 2. UX/UI
+- ✅ **Intuitivní design** s ikonami
+- ✅ **Responsivní layout** pro všechna zařízení
+- ✅ **Adaptivní tlačítka** podle obsahu
+- ✅ **Vizuální feedback** pro všechny akce
 
-## 🔒 Bezpečnost
+### 3. Funkčnost
+- ✅ **Kompletní workflow** pro správu událostí
+- ✅ **Flexibilní přiřazování** účastníků
+- ✅ **Detailní audit** všech změn
+- ✅ **Poznámky** pro všechny entity
 
-- **Row Level Security** - Každá událost je izolovaná
-- **Token validace** - Ověření přístupu na každém požadavku
-- **Audit log** - Sledování všech změn
-- **Anonymní přístup** - Bez registrace, pouze přes token
+## 📝 Poznámky
 
-## 🧪 Testování
+### ✅ Stabilní funkce
+- Všechny CRUD operace fungují
+- Audit logging je kompletní
+- UI je responsivní a intuitivní
+- Error handling je robustní
 
-Po deploymentu můžete otestovat funkce na `/test`
+### 🔄 Možná vylepšení pro v2.0
+- Notifikace pro uživatele
+- Export dat do PDF/Excel
+- Kalendářní view
+- Offline funkcionalita
+- Multi-language podpora
 
-## 📄 Licence
+## 🎉 Závěr
 
-MIT License
+**EventPlanner v1.0** je kompletní, stabilní aplikace pro správu událostí s:
+- ✅ **Kompletní funkcionalitou** pro správu účastníků, dopravy a inventáře
+- ✅ **Intuitivním UI** s adaptivními tlačítky a vizuálními indikátory
+- ✅ **Robustním backendem** s PostgreSQL a audit loggingem
+- ✅ **Responsivním designem** pro všechna zařízení
 
-## 🤝 Přispívání
-
-1. Fork repository
-2. Vytvořte feature branch
-3. Commit změny
-4. Push do branch
-5. Otevřete Pull Request
-
-## 📞 Support
-
-Pro podporu nebo dotazy:
-- Vytvořte Issue v GitHub repository
-- Kontaktujte autora projektu
+**Aplikace je připravena k produkčnímu nasazení!** 🚀
 
 ---
 
-Vytvořeno s ❤️ pro lepší plánování událostí
+## 📞 Podpora
+
+Pro problémy nebo dotazy vytvořte issue v GitHub repozitáři: https://github.com/Drexinho/eventio
