@@ -194,18 +194,13 @@ export default function EventPage({ params }: EventPageProps) {
 
       {/* Filtr sekcí */}
       <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Zobrazit sekce</CardTitle>
-          <CardDescription>
-            Vyberte, které sekce chcete zobrazit pro lepší přehlednost
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-4 gap-2">
             <Button
               variant={visibleSections.participants && visibleSections.transport && visibleSections.inventory ? "default" : "outline"}
               size="sm"
               onClick={showAll}
+              className="w-full"
             >
               Všechno
             </Button>
@@ -213,6 +208,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.participants ? "default" : "outline"}
               size="sm"
               onClick={() => toggleSection('participants')}
+              className="w-full"
             >
               👥 Účastníci
             </Button>
@@ -220,6 +216,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.transport ? "default" : "outline"}
               size="sm"
               onClick={() => toggleSection('transport')}
+              className="w-full"
             >
               🚗 Doprava
             </Button>
@@ -227,6 +224,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.inventory ? "default" : "outline"}
               size="sm"
               onClick={() => toggleSection('inventory')}
+              className="w-full"
             >
               📦 Inventář
             </Button>
