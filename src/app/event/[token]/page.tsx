@@ -19,6 +19,14 @@ export default function EventPage({ params }: EventPageProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [eventToken, setEventToken] = useState<string>('')
+  
+  // Filtr pro zobrazování sekcí
+  const [visibleSections, setVisibleSections] = useState({
+    participants: true,
+    transport: true,
+    inventory: true,
+    audit: false // Historie změn je skrytá podle požadavku
+  })
 
   useEffect(() => {
     const loadEvent = async () => {
@@ -59,6 +67,22 @@ export default function EventPage({ params }: EventPageProps) {
       }
     }
     loadEvent()
+  }
+
+  const toggleSection = (section: keyof typeof visibleSections) => {
+    setVisibleSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }))
+  }
+
+  const showAll = () => {
+    setVisibleSections({
+      participants: true,
+      transport: true,
+      inventory: true,
+      audit: false
+    })
   }
 
   if (isLoading) {
@@ -168,25 +192,98 @@ export default function EventPage({ params }: EventPageProps) {
         </CardContent>
       </Card>
 
-      {/* Účastníci a Doprava */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div>
-          <ParticipantsPanel eventToken={eventToken} />
-        </div>
-        <div>
-          <TransportPanel eventToken={eventToken} />
-        </div>
-      </div>
+      {/* Filtr sekcí */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Zobrazit sekce</CardTitle>
+          <CardDescription>
+            Vyberte, které sekce chcete zobrazit pro lepší přehlednost
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={visibleSections.participants && visibleSections.transport && visibleSections.inventory ? "default" : "outline"}
+              size="sm"
+              onClick={showAll}
+            >
+              Všechno
+            </Button>
+            <Button
+              variant={visibleSections.participants ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleSection('participants')}
+            >
+              👥 Účastníci
+            </Button>
+            <Button
+              variant={visibleSections.transport ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleSection('transport')}
+            >
+              🚗 Doprava
+            </Button>
+            <Button
+              variant={visibleSections.inventory ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleSection('inventory')}
+            >
+              📦 Inventář
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Inventář a Historie změn */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div>
+      {/* Sekce - zobrazují se podle filtru */}
+      {visibleSections.participants && visibleSections.transport && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {visibleSections.participants && (
+            <div>
+              <ParticipantsPanel eventToken={eventToken} />
+            </div>
+          )}
+          {visibleSections.transport && (
+            <div>
+              <TransportPanel eventToken={eventToken} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Inventář - zobrazuje se samostatně pokud je vybraný */}
+      {visibleSections.inventory && !visibleSections.participants && !visibleSections.transport && (
+        <div className="mb-8">
           <InventoryPanel eventToken={eventToken} />
         </div>
-        <div>
-          <AuditLog eventToken={eventToken} />
+      )}
+
+      {/* Kombinované zobrazení */}
+      {(visibleSections.participants || visibleSections.transport || visibleSections.inventory) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {visibleSections.participants && (
+            <div>
+              <ParticipantsPanel eventToken={eventToken} />
+            </div>
+          )}
+          {visibleSections.transport && (
+            <div>
+              <TransportPanel eventToken={eventToken} />
+            </div>
+          )}
+          {visibleSections.inventory && (
+            <div>
+              <InventoryPanel eventToken={eventToken} />
+            </div>
+          )}
         </div>
-      </div>
+      )}
+
+      {/* Zobrazení když není nic vybrané */}
+      {!visibleSections.participants && !visibleSections.transport && !visibleSections.inventory && (
+        <div className="text-center py-8 text-muted-foreground">
+          <p>Vyberte alespoň jednu sekci pro zobrazení</p>
+        </div>
+      )}
     </div>
   )
 } 
