@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EventPlanner - Soukromý plánovač událostí
 
-## Getting Started
+Moderní webová aplikace pro soukromé plánování událostí s podporou více skupin a bezpečným přístupem přes unikátní odkazy nebo PIN kódy.
 
-First, run the development server:
+## 🚀 Funkce
+
+- **Soukromé události** - Každá událost má unikátní odkaz nebo PIN kód
+- **Spolupráce v reálném čase** - Všichni s přístupem mohou editovat
+- **Správa účastníků** - Přidávání, editace a mazání účastníků
+- **Plánování dopravy** - Přiřazování účastníků k dopravě
+- **Inventář** - Seznam věcí, které si účastníci vezmou s sebou
+- **Audit log** - Historie všech změn
+- **Responsivní design** - Funguje na všech zařízeních
+
+## 🛠️ Technologie
+
+- **Frontend**: Next.js 15 (App Router), TypeScript
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Formuláře**: React Hook Form + Zod validace
+- **Databáze**: Supabase (PostgreSQL)
+- **Bezpečnost**: Row Level Security (RLS)
+- **Deployment**: Vercel
+
+## 📦 Instalace
 
 ```bash
+# Klonování repository
+git clone <repository-url>
+cd event-planner
+
+# Instalace závislostí
+npm install
+
+# Nastavení environment proměnných
+cp .env.local.example .env.local
+# Upravte .env.local s vašimi Supabase údaji
+
+# Spuštění vývojového serveru
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔧 Konfigurace
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment proměnné
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Vytvořte soubor `.env.local`:
 
-## Learn More
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Supabase nastavení
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Vytvořte projekt na [supabase.com](https://supabase.com)
+2. Spusťte SQL skript `supabase-schema.sql`
+3. Zkopírujte URL a API klíče do `.env.local`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Deployment
 
-## Deploy on Vercel
+### Vercel (doporučeno)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Pushněte kód do GitHub repository
+2. Importujte projekt do Vercel
+3. Nastavte environment proměnné
+4. Deploy!
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Více informací v [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+## 📱 Použití
+
+### Vytvoření události
+1. Jděte na `/create`
+2. Vyplňte informace o události
+3. Vyberte typ přístupu (odkaz nebo PIN)
+4. Získejte unikátní odkaz pro sdílení
+
+### Připojení k události
+1. Jděte na `/join`
+2. Zadejte odkaz nebo PIN kód
+3. Začněte spolupracovat!
+
+### Správa události
+- **Účastníci**: Přidávejte a spravujte seznam účastníků
+- **Doprava**: Plánujte dopravu a přiřazujte účastníky
+- **Inventář**: Spravujte seznam věcí
+- **Historie**: Sledujte všechny změny
+
+## 🔒 Bezpečnost
+
+- **Row Level Security** - Každá událost je izolovaná
+- **Token validace** - Ověření přístupu na každém požadavku
+- **Audit log** - Sledování všech změn
+- **Anonymní přístup** - Bez registrace, pouze přes token
+
+## 🧪 Testování
+
+Po deploymentu můžete otestovat funkce na `/test`
+
+## 📄 Licence
+
+MIT License
+
+## 🤝 Přispívání
+
+1. Fork repository
+2. Vytvořte feature branch
+3. Commit změny
+4. Push do branch
+5. Otevřete Pull Request
+
+## 📞 Support
+
+Pro podporu nebo dotazy:
+- Vytvořte Issue v GitHub repository
+- Kontaktujte autora projektu
+
+---
+
+Vytvořeno s ❤️ pro lepší plánování událostí
