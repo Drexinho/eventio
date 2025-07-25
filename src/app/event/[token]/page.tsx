@@ -87,7 +87,7 @@ export default function EventPage({ params }: EventPageProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-300 text-lg">Načítám událost...</p>
@@ -98,7 +98,7 @@ export default function EventPage({ params }: EventPageProps) {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-20 h-20 bg-red-900/20 border border-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">❌</span>
@@ -112,7 +112,7 @@ export default function EventPage({ params }: EventPageProps) {
 
   if (isEditing) {
     return (
-      <div className="min-h-screen bg-black p-4">
+      <div className="min-h-screen p-4">
         <div className="container mx-auto">
           <Button 
             variant="outline" 
@@ -132,7 +132,7 @@ export default function EventPage({ params }: EventPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen">
       <div className="container mx-auto p-4">
         {/* Hero Card */}
         <Card className="mb-8 border border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-2xl">
