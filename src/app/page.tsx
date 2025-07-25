@@ -83,7 +83,7 @@ export default function Home() {
           <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
             <CardHeader className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-3xl">⚡</span>
+                <span className="text-3xl">🔄</span>
               </div>
               <CardTitle className="text-2xl font-bold text-white">
                 Spolupráce v reálném čase
