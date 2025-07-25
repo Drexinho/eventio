@@ -205,8 +205,8 @@ export default function EventPage({ params }: EventPageProps) {
                     <img 
                       src={event.image_url} 
                       alt={event.name}
-                      className="w-full max-w-md h-auto rounded-2xl shadow-2xl group-hover:shadow-cyan-500/25 transition-all duration-500 transform group-hover:scale-105"
-                      style={{ width: '60%' }}
+                      className="w-full max-w-lg h-auto rounded-2xl shadow-2xl group-hover:shadow-cyan-500/25 transition-all duration-500 transform group-hover:scale-105"
+                      style={{ width: '80%' }}
                       onError={(e) => {
                         e.currentTarget.style.display = 'none'
                       }}
