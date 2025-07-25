@@ -35,9 +35,8 @@ export default function Home() {
                 </a>
               </Button>
               <Button 
-                variant="outline" 
                 size="lg" 
-                className="border-2 border-slate-600 text-slate-300 px-10 py-6 text-lg font-semibold hover:bg-slate-800 hover:border-cyan-500 transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white px-10 py-6 text-lg font-semibold shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 border-0"
                 asChild
               >
                 <a href="/join">
@@ -84,7 +83,7 @@ export default function Home() {
           <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
             <CardHeader className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-3xl">🌐</span>
+                <span className="text-3xl">⚡</span>
               </div>
               <CardTitle className="text-2xl font-bold text-white">
                 Spolupráce v reálném čase
