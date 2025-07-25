@@ -199,22 +199,25 @@ export default function EventPage({ params }: EventPageProps) {
               </div>
 
               {/* Pravý sloupec - obrázek */}
-              {event.image_url && (
-                <div className="flex justify-center lg:justify-end">
-                  <div className="relative group">
+              <div className="flex justify-center lg:justify-end">
+                <div className="relative group">
+                  {event.image_url ? (
                     <img 
                       src={event.image_url} 
                       alt={event.name}
-                      className="w-full max-w-2xl h-auto rounded-2xl shadow-2xl group-hover:shadow-cyan-500/25 transition-all duration-500 transform group-hover:scale-105"
-                      style={{ width: '100%' }}
+                      className="w-96 h-64 object-cover rounded-2xl shadow-2xl group-hover:shadow-cyan-500/25 transition-all duration-500 transform group-hover:scale-105"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none'
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </div>
+                  ) : (
+                    <div className="w-96 h-64 bg-slate-800/50 border border-slate-700 rounded-2xl flex items-center justify-center">
+                      <span className="text-slate-400 text-lg">Žádný obrázek</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-              )}
+              </div>
             </div>
           </CardContent>
         </Card>
