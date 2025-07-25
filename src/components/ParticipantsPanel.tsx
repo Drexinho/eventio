@@ -159,12 +159,12 @@ export function ParticipantsPanel({ eventToken }: ParticipantsPanelProps) {
   }
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700 backdrop-blur-sm shadow-xl">
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle>👥 Účastníci</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-slate-200">👥 Účastníci</CardTitle>
+            <CardDescription className="text-slate-400">
               Správa účastníků události
             </CardDescription>
           </div>
@@ -172,6 +172,7 @@ export function ParticipantsPanel({ eventToken }: ParticipantsPanelProps) {
             variant="outline"
             size="sm"
             onClick={() => setIsFormOpen(!isFormOpen)}
+            className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-slate-100"
           >
             {isFormOpen ? <ChevronUp className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           </Button>
@@ -180,17 +181,18 @@ export function ParticipantsPanel({ eventToken }: ParticipantsPanelProps) {
       <CardContent>
         {/* Formulář pro přidávání */}
         {isFormOpen && (
-          <div className="mb-6 p-4 border rounded-lg bg-muted/50">
+          <div className="mb-6 p-4 border border-slate-700 rounded-lg bg-gradient-to-r from-purple-500/20 to-cyan-500/20 backdrop-blur-sm shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Jméno *</Label>
+                <Label htmlFor="name" className="text-slate-300">Jméno *</Label>
                 <Input
                   id="name"
                   {...register('name')}
                   placeholder="Jméno účastníka"
+                  className="bg-slate-700/50 border-slate-600 text-slate-800 placeholder-slate-400 focus:border-purple-500 focus:ring-purple-500/20"
                 />
                 {errors.name && (
-                  <p className="text-sm text-red-500">{errors.name.message}</p>
+                  <p className="text-sm text-red-400">{errors.name.message}</p>
                 )}
               </div>
 
@@ -199,21 +201,22 @@ export function ParticipantsPanel({ eventToken }: ParticipantsPanelProps) {
                   type="checkbox"
                   id="staying_full_time"
                   {...register('staying_full_time')}
-                  className="rounded"
+                  className="rounded bg-slate-700/50 border-slate-600 focus:ring-purple-500/20"
                 />
-                <Label htmlFor="staying_full_time">Budu na celou dobu?</Label>
+                <Label htmlFor="staying_full_time" className="text-slate-300">Budu na celou dobu?</Label>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="notes">Poznámky</Label>
+                <Label htmlFor="notes" className="text-slate-300">Poznámky</Label>
                 <Input
                   id="notes"
                   {...register('notes')}
                   placeholder="Dodatečné informace o účastníkovi..."
+                  className="bg-slate-700/50 border-slate-600 text-slate-800 placeholder-slate-400 focus:border-purple-500 focus:ring-purple-500/20"
                 />
               </div>
 
-              <Button type="submit" disabled={isAdding}>
+              <Button type="submit" disabled={isAdding} className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0 shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105">
                 {isAdding ? 'Přidávám...' : 'Přidat účastníka'}
               </Button>
             </form>
@@ -225,14 +228,14 @@ export function ParticipantsPanel({ eventToken }: ParticipantsPanelProps) {
           {participants.map((participant) => (
             <div key={participant.id}>
               {/* Účastník */}
-              <div className="flex justify-between items-center p-3 border rounded-lg">
+              <div className="flex justify-between items-center p-3 border border-slate-700 rounded-lg bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-sm shadow-lg hover:shadow-cyan-500/25 transition-all duration-300">
                 <div className="flex-1">
-                  <p className="font-medium">{participant.name}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium text-black">{participant.name}</p>
+                  <p className="text-sm text-slate-700">
                     {participant.staying_full_time ? '🏠 Zůstává celý čas' : '🏃 Zůstává jen část času'}
                   </p>
                   {participant.notes && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-slate-700">
                       📝 {participant.notes}
                     </p>
                   )}
@@ -242,6 +245,7 @@ export function ParticipantsPanel({ eventToken }: ParticipantsPanelProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => handleEdit(participant)}
+                    className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/20 hover:border-cyan-400 transition-all duration-300"
                   >
                     ✏️
                   </Button>
@@ -249,7 +253,7 @@ export function ParticipantsPanel({ eventToken }: ParticipantsPanelProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDelete(participant.id)}
-                    className="text-red-500 hover:text-red-700"
+                    className="border-red-500 text-red-400 hover:bg-red-500/20 hover:border-red-400 transition-all duration-300"
                   >
                     🗑️
                   </Button>
@@ -258,18 +262,19 @@ export function ParticipantsPanel({ eventToken }: ParticipantsPanelProps) {
 
               {/* Editační formulář inline */}
               {editingId === participant.id && (
-                <div className="mt-2 p-4 border rounded-lg bg-muted/50">
-                  <h3 className="font-medium mb-4">Upravit účastníka</h3>
+                <div className="mt-2 p-4 border border-slate-700 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm shadow-lg">
+                  <h3 className="font-medium mb-4 text-slate-800">Upravit účastníka</h3>
                   <form onSubmit={handleSubmit(handleSaveEdit)} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="edit_name">Jméno *</Label>
+                      <Label htmlFor="edit_name" className="text-slate-300">Jméno *</Label>
                       <Input
                         id="edit_name"
                         {...register('name')}
                         placeholder="Jméno účastníka"
+                        className="bg-slate-700/50 border-slate-600 text-slate-800 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                       />
                       {errors.name && (
-                        <p className="text-sm text-red-500">{errors.name.message}</p>
+                        <p className="text-sm text-red-400">{errors.name.message}</p>
                       )}
                     </div>
 
@@ -278,25 +283,26 @@ export function ParticipantsPanel({ eventToken }: ParticipantsPanelProps) {
                         type="checkbox"
                         id="edit_staying_full_time"
                         {...register('staying_full_time')}
-                        className="rounded"
+                        className="rounded bg-slate-700/50 border-slate-600 focus:ring-cyan-500/20"
                       />
-                      <Label htmlFor="edit_staying_full_time">Budu na celou dobu?</Label>
+                      <Label htmlFor="edit_staying_full_time" className="text-slate-300">Budu na celou dobu?</Label>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="edit_notes">Poznámky</Label>
+                      <Label htmlFor="edit_notes" className="text-slate-300">Poznámky</Label>
                       <Input
                         id="edit_notes"
                         {...register('notes')}
                         placeholder="Dodatečné informace o účastníkovi..."
+                        className="bg-slate-700/50 border-slate-600 text-slate-800 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                       />
                     </div>
 
                     <div className="flex gap-2">
-                      <Button type="submit">
+                      <Button type="submit" className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0 shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105">
                         Uložit změny
                       </Button>
-                      <Button type="button" variant="outline" onClick={handleCancelEdit}>
+                      <Button type="button" variant="outline" onClick={handleCancelEdit} className="border-slate-600 text-slate-300 hover:bg-slate-700">
                         Zrušit
                       </Button>
                     </div>
@@ -307,7 +313,7 @@ export function ParticipantsPanel({ eventToken }: ParticipantsPanelProps) {
           ))}
 
           {participants.length === 0 && (
-            <p className="text-center text-muted-foreground py-4">
+            <p className="text-center text-slate-500 py-4">
               Zatím nejsou žádní účastníci
             </p>
           )}
