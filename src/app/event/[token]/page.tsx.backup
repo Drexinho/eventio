@@ -226,7 +226,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.participants && visibleSections.transport && visibleSections.inventory ? "default" : "outline"}
               size="sm"
               onClick={showAll}
-              className={`w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0 shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 py-4 ${(visibleSections.participants && visibleSections.transport && visibleSections.inventory) ? 'border-b-4 border-gradient-to-r from-cyan-500 to-blue-500' : ''}`}
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0 shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
             >
               Všechno
             </Button>
@@ -234,7 +234,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.participants ? "default" : "outline"}
               size="sm"
               onClick={() => toggleSection('participants')}
-              className={`w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 py-4 ${visibleSections.participants ? 'border-b-4 border-gradient-to-r from-blue-500 to-purple-500' : ''}`}
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105"
             >
               👥 Účastníci
             </Button>
@@ -242,7 +242,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.transport ? "default" : "outline"}
               size="sm"
               onClick={() => toggleSection('transport')}
-              className={`w-full bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0 shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 py-4 ${visibleSections.transport ? 'border-b-4 border-gradient-to-r from-purple-500 to-cyan-500' : ''}`}
+              className="w-full bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0 shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105"
             >
               🚗 Doprava
             </Button>
@@ -250,7 +250,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.inventory ? "default" : "outline"}
               size="sm"
               onClick={() => toggleSection('inventory')}
-              className={`w-full bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white border-0 shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 py-4 ${visibleSections.inventory ? 'border-b-4 border-gradient-to-r from-cyan-500 to-green-500' : ''}`}
+              className="w-full bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white border-0 shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
             >
               📦 Inventář
             </Button>
@@ -258,8 +258,14 @@ export default function EventPage({ params }: EventPageProps) {
         </div>
 
         {/* Sekce - zobrazují se podle filtru */}
+        {/* Sekce - zobrazují se podle filtru */}
         {(visibleSections.participants || visibleSections.transport || visibleSections.inventory) && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          (() => {
+            const visibleCount = [visibleSections.participants, visibleSections.transport, visibleSections.inventory].filter(Boolean).length;
+            const gridClass = visibleCount === 3 ? "grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" : "grid grid-cols-1 lg:grid-cols-1 gap-8 mb-8";
+            return (
+              <div className={gridClass}>
+
             {visibleSections.participants && (
               <div className="transform hover:scale-[1.02] transition-all duration-300 bg-slate-900/20 rounded-2xl p-4">
                 <ParticipantsPanel eventToken={eventToken} />
@@ -274,6 +280,13 @@ export default function EventPage({ params }: EventPageProps) {
               <div className="transform hover:scale-[1.02] transition-all duration-300 bg-slate-900/20 rounded-2xl p-4">
                 <InventoryPanel eventToken={eventToken} />
               </div>
+            );
+          })()
+              </div>
+            )}
+          </div>
+        )}
+
             )}
           </div>
         )}
