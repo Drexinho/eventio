@@ -174,12 +174,12 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
   }
 
   return (
-    <Card>
+    <Card className="bg-transparent border-0">
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle>📦 Inventář</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-slate-200">📦 Inventář</CardTitle>
+            <CardDescription className="text-slate-400">
               Správa věcí a vybavení
             </CardDescription>
           </div>
@@ -187,6 +187,7 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
             variant="outline"
             size="sm"
             onClick={() => setIsFormOpen(!isFormOpen)}
+            className="border-0 text-slate-100 bg-slate-800/50 hover:bg-slate-700 hover:text-slate-100 hover:border-0"
           >
             {isFormOpen ? <ChevronUp className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           </Button>
@@ -195,12 +196,12 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
       <CardContent>
         {/* Formulář pro přidávání */}
         {isFormOpen && (
-          <div className="mb-6 p-4 border rounded-lg bg-muted/50">
+          <div className="mb-6 p-4 border-0 rounded-lg bg-gradient-to-r from-purple-500/20 to-cyan-500/20 backdrop-blur-sm shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Název položky *</Label>
-                  <Input
+                  <Label htmlFor="name" className="text-slate-100">Název položky *</Label>
+                  <Input className="bg-slate-700/50 border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                     id="name"
                     {...register('name')}
                     placeholder="Stan, spacák, jídlo..."
@@ -211,8 +212,8 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="quantity">Množství *</Label>
-                  <Input
+                  <Label htmlFor="quantity" className="text-slate-100">Množství *</Label>
+                  <Input className="bg-slate-700/50 border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                     id="quantity"
                     type="number"
                     min="1"
@@ -226,11 +227,11 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="assigned_to">Přiřadit účastníkovi</Label>
+                <Label htmlFor="assigned_to" className="text-slate-100">Přiřadit účastníkovi</Label>
                 <select
                   id="assigned_to"
                   {...register('assigned_to')}
-                  className="w-full px-3 py-2 border rounded-md"
+                  className="w-full px-3 py-2 border border-slate-600 rounded-md bg-slate-700/50 text-slate-100 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                 >
                   <option value="">Nikdo (volná položka)</option>
                   {participants.map((participant) => (
@@ -242,15 +243,15 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="notes">Poznámky</Label>
-                <Input
+                <Label htmlFor="notes" className="text-slate-100">Poznámky</Label>
+                <Input className="bg-slate-700/50 border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                   id="notes"
                   {...register('notes')}
                   placeholder="Dodatečné informace o položce..."
                 />
               </div>
 
-              <Button type="submit" disabled={isAdding}>
+              <Button type="submit" disabled={isAdding} className="border-0 text-slate-100 bg-slate-800/50 hover:bg-slate-700 hover:text-slate-100 hover:border-0 transition-all duration-300">
                 {isAdding ? 'Přidávám...' : 'Přidat položku'}
               </Button>
             </form>
@@ -262,17 +263,17 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
           {inventory.map((item) => (
             <div key={item.id}>
               {/* Položka */}
-              <div className="flex justify-between items-center p-3 border rounded-lg">
+              <div className="flex justify-between items-center p-3 border-0 rounded-lg bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-sm shadow-lg hover:shadow-slate-500/25 transition-all duration-300">
                 <div className="flex-1">
-                  <p className="font-medium">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium text-slate-100">{item.name}</p>
+                  <p className="text-sm text-slate-100">
                     Množství: {item.quantity}
                     {item.assigned_participant_name && (
                       <span className="ml-2">• Beru: {item.assigned_participant_name}</span>
                     )}
                   </p>
                   {item.notes && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-slate-100">
                       📝 {item.notes}
                     </p>
                   )}
@@ -281,15 +282,16 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleEdit(item)}
+                    onClick={() => editingId === item.id ? handleCancelEdit() : handleEdit(item)}
+                    className={editingId === item.id ? "border-red-500 text-red-400 bg-slate-800 hover:bg-red-600 hover:text-white hover:border-red-600 transform hover:scale-110 transition-all duration-300" : "border-cyan-500 text-cyan-400 bg-slate-800 hover:bg-cyan-600 hover:text-white hover:border-cyan-600 transform hover:scale-110 transition-all duration-300"}
                   >
-                    ✏️
+                    {editingId === item.id ? "❌" : "✏️"}
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleDelete(item.id)}
-                    className="text-red-500 hover:text-red-700"
+                    className="border-red-500 text-red-400 bg-slate-800 hover:bg-red-600 hover:border-red-600 transform hover:scale-110 transition-all duration-300"
                   >
                     🗑️
                   </Button>
@@ -298,13 +300,13 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
 
               {/* Editační formulář inline */}
               {editingId === item.id && (
-                <div className="mt-2 p-4 border rounded-lg bg-muted/50">
-                  <h3 className="font-medium mb-4">Upravit položku</h3>
+                <div className="mt-2 p-4 border-0 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm shadow-lg">
+                  <h3 className="font-medium text-slate-100 mb-4">Upravit položku</h3>
                   <form onSubmit={handleSubmit(handleSaveEdit)} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="edit_name">Název položky *</Label>
-                        <Input
+                        <Label htmlFor="edit_name" className="text-slate-100">Název položky *</Label>
+                        <Input className="bg-slate-700/50 border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                           id="edit_name"
                           {...register('name')}
                           placeholder="Stan, spacák, jídlo..."
@@ -315,8 +317,8 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="edit_quantity">Množství *</Label>
-                        <Input
+                        <Label htmlFor="edit_quantity" className="text-slate-100">Množství *</Label>
+                        <Input className="bg-slate-700/50 border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                           id="edit_quantity"
                           type="number"
                           min="1"
@@ -330,11 +332,11 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="edit_assigned_to">Přiřadit účastníkovi</Label>
+                      <Label htmlFor="edit_assigned_to" className="text-slate-100">Přiřadit účastníkovi</Label>
                       <select
                         id="edit_assigned_to"
                         {...register('assigned_to')}
-                        className="w-full px-3 py-2 border rounded-md"
+                        className="w-full px-3 py-2 border border-slate-600 rounded-md bg-slate-700/50 text-slate-100 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                       >
                         <option value="">Nikdo (volná položka)</option>
                         {participants.map((participant) => (
@@ -346,8 +348,8 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="edit_notes">Poznámky</Label>
-                      <Input
+                      <Label htmlFor="edit_notes" className="text-slate-100">Poznámky</Label>
+                      <Input className="bg-slate-700/50 border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                         id="edit_notes"
                         {...register('notes')}
                         placeholder="Dodatečné informace o položce..."
@@ -355,10 +357,10 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button type="submit">
+                      <Button type="submit" className="border-0 text-slate-100 bg-slate-800/50 hover:bg-slate-700 hover:text-slate-100 hover:border-0 transition-all duration-300">
                         Uložit změny
                       </Button>
-                      <Button type="button" variant="outline" onClick={handleCancelEdit}>
+                      <Button type="button" variant="outline" onClick={handleCancelEdit} className="border-0 text-slate-100 bg-slate-800/50 hover:bg-slate-700 hover:text-slate-100 hover:border-0">
                         Zrušit
                       </Button>
                     </div>
@@ -369,7 +371,7 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
           ))}
 
           {inventory.length === 0 && (
-            <p className="text-center text-muted-foreground py-4">
+            <p className="text-center text-slate-100 py-4">
               Zatím nejsou žádné položky v inventáři
             </p>
           )}
