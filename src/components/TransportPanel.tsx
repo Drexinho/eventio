@@ -246,7 +246,7 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
 
   return (
     <Card className="bg-gradient-to-br from-slate-800/30 via-slate-700/40 to-slate-900/50 backdrop-blur-md border border-slate-600/30 shadow-2xl">
-      <CardHeader className="border-b border-slate-600/40 p-2">
+      <CardHeader className="border-b border-slate-600/40 py-1 px-2">
         <div className="flex justify-between items-center pl-3">
           <div>
             <CardTitle className="text-slate-100 flex items-center gap-2 text-lg font-semibold">
@@ -259,7 +259,7 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
               Organizace dopravy
             </CardDescription>
           </div>
-          <Button className="border border-slate-500/30 text-slate-100 bg-slate-700/50 hover:bg-slate-600/50 hover:text-slate-100 hover:border-slate-400/50 transition-all duration-300 shadow-lg"
+          <Button className="border border-slate-500/30 text-slate-100 bg-slate-700/50 hover:bg-slate-600/50 hover:text-slate-100 hover:border-slate-400/50 transition-all duration-300 shadow-lg mr-6"
             variant="outline"
             size="sm"
             onClick={() => setIsFormOpen(!isFormOpen)}
@@ -268,7 +268,7 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="p-6 pt-6 space-y-6">
         {/* Formulář pro přidávání */}
         {isFormOpen && (
           <div className="mb-6 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl">
@@ -556,7 +556,7 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
                             className={`h-auto px-2 py-1 text-sm whitespace-nowrap transition-all duration-300 ${
                               isAssigned 
                                 ? "bg-gradient-to-r from-emerald-500/80 to-teal-500/80 text-white border-2 border-emerald-400/60 rounded-full shadow-lg hover:shadow-emerald-500/25 hover:scale-105" 
-                                : "bg-gradient-to-r from-slate-600/50 to-slate-700/50 text-slate-200 border-2 border-slate-500/40 rounded-full shadow-md hover:shadow-slate-500/25 hover:scale-105 hover:bg-gradient-to-r hover:from-slate-500/60 hover:to-slate-600/60"
+                                : "bg-gradient-to-r from-slate-600/50 to-slate-700/50 text-slate-200 border-2 border-slate-500/40 rounded-full shadow-md hover:shadow-slate-500/25 hover:scale-105 hover:text-white"
                             }`}
                             onClick={() => {
                               if (isAssigned) {

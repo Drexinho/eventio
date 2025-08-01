@@ -259,19 +259,19 @@ export default function EventPage({ params }: EventPageProps) {
 
         {/* Sekce - zobrazují se podle filtru */}
         {(visibleSections.participants || visibleSections.transport || visibleSections.inventory) && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8 items-start auto-rows-min [&>*:nth-child(odd)]:mb-0 [&>*:nth-child(even)]:mb-0 [&>*:nth-child(3)]:lg:col-start-1">
             {visibleSections.participants && (
-              <div className="transform hover:scale-[1.02] transition-all duration-300 bg-slate-900/20 rounded-2xl p-4">
+              <div className="transform hover:scale-[1.02] transition-all duration-300">
                 <ParticipantsPanel eventToken={eventToken} />
               </div>
             )}
             {visibleSections.transport && (
-              <div className="transform hover:scale-[1.02] transition-all duration-300 bg-slate-900/20 rounded-2xl p-4">
+              <div className="transform hover:scale-[1.02] transition-all duration-300">
                 <TransportPanel eventToken={eventToken} />
               </div>
             )}
             {visibleSections.inventory && (
-              <div className="transform hover:scale-[1.02] transition-all duration-300 bg-slate-900/20 rounded-2xl p-4">
+              <div className="transform hover:scale-[1.02] transition-all duration-300">
                 <InventoryPanel eventToken={eventToken} />
               </div>
             )}
