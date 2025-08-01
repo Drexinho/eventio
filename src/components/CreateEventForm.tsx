@@ -80,6 +80,7 @@ export function CreateEventForm() {
       }
 
       console.log('Odesílám data na API:', eventData)
+      console.log('Start date:', data.start_date, 'End date:', data.end_date)
 
       const response = await fetch('/api/events', {
         method: 'POST',
