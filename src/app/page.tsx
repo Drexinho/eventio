@@ -137,29 +137,16 @@ export default function Home() {
           <p className="text-xl mb-8 text-slate-300">
             Vytvořte svou první událost a přesvědčte se sami
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-12 py-6 text-xl font-semibold shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 border-0"
-              asChild
-            >
-              <a href="/create">
-                <span className="mr-3">🚀</span>
-                Vytvořit událost
-              </a>
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="border-slate-600 text-white hover:bg-slate-700 px-12 py-6 text-xl font-semibold transition-all duration-300 transform hover:scale-105"
-              asChild
-            >
-              <a href="/demo">
-                <span className="mr-3">🎮</span>
-                Vyzkoušet demo
-              </a>
-            </Button>
-          </div>
+          <Button 
+            size="lg" 
+            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-12 py-6 text-xl font-semibold shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 border-0"
+            asChild
+          >
+            <a href="/create">
+              <span className="mr-3">🚀</span>
+              Vytvořit událost
+            </a>
+          </Button>
         </div>
       </div>
     </div>
