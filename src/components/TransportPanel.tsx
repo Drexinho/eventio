@@ -245,16 +245,21 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
   }
 
   return (
-    <Card className="bg-transparent border-0">
-      <CardHeader>
-        <div className="flex justify-between items-center">
+    <Card className="bg-gradient-to-br from-slate-800/30 via-slate-700/40 to-slate-900/50 backdrop-blur-md border border-slate-600/30 shadow-2xl">
+      <CardHeader className="border-b border-slate-600/40 p-2">
+        <div className="flex justify-between items-center pl-3">
           <div>
-            <CardTitle className="text-slate-100">🚗 Doprava</CardTitle>
-            <CardDescription className="text-slate-100">
-              Správa dopravních možností
+            <CardTitle className="text-slate-100 flex items-center gap-2 text-lg font-semibold">
+              <div className="p-1.5 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg">
+                🚗
+              </div>
+              Doprava
+            </CardTitle>
+            <CardDescription className="text-slate-300 mt-0.5 text-sm">
+              Organizace dopravy
             </CardDescription>
           </div>
-          <Button className="border-0 text-slate-100 bg-slate-800/50 hover:bg-slate-700 hover:text-slate-100 hover:border-0"
+          <Button className="border border-slate-500/30 text-slate-100 bg-slate-700/50 hover:bg-slate-600/50 hover:text-slate-100 hover:border-slate-400/50 transition-all duration-300 shadow-lg"
             variant="outline"
             size="sm"
             onClick={() => setIsFormOpen(!isFormOpen)}
@@ -263,15 +268,15 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6 space-y-6">
         {/* Formulář pro přidávání */}
         {isFormOpen && (
-          <div className="mb-6 p-4 border-0 rounded-lg bg-gradient-to-r from-purple-500/20 to-cyan-500/20 backdrop-blur-sm shadow-lg">
+          <div className="mb-6 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-slate-100" htmlFor="type">Typ dopravy *</Label>
-                  <Input className="bg-slate-700/50 border-0 text-slate-100 placeholder-slate-400 focus:border-cyan-500 focus:ring-cyan-500/20"
+                  <Input className="bg-slate-800/50 border border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 focus:bg-slate-700/50 transition-all duration-300"
                     id="type"
                     {...register('type')}
                     placeholder="Auto, vlak, autobus..."
@@ -413,7 +418,7 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
                 </div>
               </div>
 
-              <Button type="submit" disabled={isAdding} className="bg-slate-800 text-slate-100 border-red-500 hover:bg-red-600 hover:text-slate-100 hover:border-red-600 transition-all duration-300">
+              <Button type="submit" disabled={isAdding} className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 shadow-lg">
                 {isAdding ? 'Přidávám...' : 'Přidat dopravu'}
               </Button>
             </form>
@@ -427,9 +432,24 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
             const pricePerPerson = Math.ceil(transportItem.price / Math.max(assignedCount, 1))
 
             return (
-              <div key={transportItem.id}>
-                {/* Doprava */}
-                <div className="border-0 rounded-lg p-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-sm shadow-lg hover:shadow-slate-500/25 transition-all duration-300">
+                              <div key={transportItem.id}>
+                  {/* Doprava */}
+                  <div className="border border-slate-600/30 rounded-xl p-6 bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl hover:shadow-slate-500/25 transition-all duration-300 relative">
+                    {/* Razítko "NAPLNĚNO" když je kapacita naplněna */}
+                    {assignedCount >= transportItem.capacity && transportItem.capacity > 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                        <div className="bg-green-600/95 text-white font-bold text-2xl px-8 py-4 rounded-lg transform -rotate-12 shadow-2xl border-4 border-white/80 relative overflow-hidden">
+                          {/* Texturovaný efekt gumového razítka */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-green-700/50 to-green-500/50 opacity-60"></div>
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.1)_0%,transparent_50%)]"></div>
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_70%,rgba(0,0,0,0.1)_0%,transparent_50%)]"></div>
+                          {/* Hlavní text s efektem */}
+                          <div className="relative z-10 font-mono tracking-wider text-shadow-sm">
+                            NAPLNĚNO
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <h3 className="font-medium text-slate-100">{transportItem.type}</h3>
@@ -471,7 +491,7 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => editingId === transportItem.id ? handleCancelEdit() : handleEdit(transportItem)}
-                        className={editingId === transportItem.id ? "border-red-500 text-red-400 bg-slate-800/50 hover:bg-red-600 hover:text-white hover:border-red-600 transform hover:scale-110 transition-all duration-300" : "border-cyan-500 text-cyan-400 bg-slate-800/50 hover:bg-cyan-600 hover:text-white hover:border-cyan-600 transform hover:scale-110 transition-all duration-300"}
+                        className={editingId === transportItem.id ? "border-red-400 text-red-300 bg-slate-700/50 hover:bg-red-600/50 hover:text-white hover:border-red-400 transform hover:scale-105 transition-all duration-300 shadow-md" : "border-cyan-400 text-cyan-300 bg-slate-700/50 hover:bg-cyan-600/50 hover:text-white hover:border-cyan-400 transform hover:scale-105 transition-all duration-300 shadow-md"}
                       >
                         {editingId === transportItem.id ? "❌" : "✏️"}
                       </Button>
@@ -479,35 +499,49 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => handleDelete(transportItem.id)}
-                        className="bg-slate-800 text-slate-100 border-red-500 hover:bg-red-600 hover:text-slate-100 hover:border-red-600 transition-all duration-300"
+                        className="border-red-400 text-red-300 bg-slate-700/50 hover:bg-red-600/50 hover:text-white hover:border-red-400 transition-all duration-300 shadow-md"
                       >
                         🗑️
                       </Button>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
-                    <div className="text-center p-2 bg-slate-800 rounded">
-                      <p className="text-xs text-slate-100">Kapacita</p>
-                      <p className="font-medium text-slate-100">{transportItem.capacity}</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+                    <div className="text-center p-4 bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-purple-500/10 rounded-xl border border-cyan-500/20 backdrop-blur-sm shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 flex flex-col items-center justify-center group">
+                      <p className="text-xs text-cyan-300 mb-2 font-medium">Kapacita</p>
+                      <p className="font-bold text-cyan-100 text-xl group-hover:text-cyan-50 transition-colors">{transportItem.capacity}</p>
                     </div>
-                    <div className="text-center p-2 bg-slate-800 rounded">
-                      <p className="text-xs text-slate-100">Přiřazeno</p>
-                      <p className="font-medium text-slate-100">{assignedCount}</p>
+                    <div className="text-center p-4 bg-gradient-to-br from-green-500/10 via-emerald-500/10 to-teal-500/10 rounded-xl border border-green-500/20 backdrop-blur-sm shadow-lg hover:shadow-green-500/25 transition-all duration-300 flex flex-col items-center justify-center group">
+                      <p className="text-xs text-green-300 mb-2 font-medium">Přiřazeno</p>
+                      <p className="font-bold text-green-100 text-xl group-hover:text-green-50 transition-colors">{assignedCount}</p>
                     </div>
-                    <div className="text-center p-2 bg-slate-800 rounded">
-                      <p className="text-xs text-slate-100">Cena celkem</p>
-                      <p className="font-medium text-slate-100">{transportItem.price} Kč</p>
+                    <div className="text-center p-4 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-yellow-500/10 rounded-xl border border-orange-500/20 backdrop-blur-sm shadow-lg hover:shadow-orange-500/25 transition-all duration-300 flex flex-col items-center justify-center group">
+                      <p className="text-xs text-orange-300 mb-2 font-medium">Cena celkem</p>
+                      <p className="font-bold text-orange-100 text-xl group-hover:text-orange-50 transition-colors">{Math.round(transportItem.price)} Kč</p>
                     </div>
-                    <div className="text-center p-2 bg-slate-800 rounded">
-                      <p className="text-xs text-slate-100">Cena na jednoho</p>
-                      <p className="font-medium text-slate-100">{pricePerPerson} Kč</p>
+                    <div className={`text-center p-4 rounded-xl backdrop-blur-sm shadow-lg transition-all duration-500 flex flex-col items-center justify-center group ${
+                      assignedCount >= transportItem.capacity && transportItem.capacity > 0
+                        ? "bg-gradient-to-br from-green-500/20 via-emerald-500/20 to-teal-500/20 border border-green-400/40 shadow-green-500/30 hover:shadow-green-400/40 animate-pulse"
+                        : "bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-rose-500/10 border border-purple-500/20 hover:shadow-purple-500/25"
+                    }`}>
+                      <p className={`text-xs mb-2 font-medium ${
+                        assignedCount >= transportItem.capacity && transportItem.capacity > 0
+                          ? "text-green-300"
+                          : "text-purple-300"
+                      }`}>Na jednoho</p>
+                      <p className={`font-bold text-xl transition-colors ${
+                        assignedCount >= transportItem.capacity && transportItem.capacity > 0
+                          ? "text-green-100 group-hover:text-green-50"
+                          : "text-purple-100 group-hover:text-purple-50"
+                      }`}>
+                        {pricePerPerson} Kč
+                      </p>
                     </div>
                   </div>
 
                   {/* Přiřazení účastníků */}
                   <div className="space-y-2">
-                    <h4 className="font-medium">Přiřadit účastníky:</h4>
+                    <h4 className="font-medium text-slate-100">Přiřadit účastníky:</h4>
                     <div className="flex flex-wrap gap-2">
                       {participants.map((participant) => {
                         const isAssigned = transportItem.transport_assignments?.some(
@@ -519,7 +553,11 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
                             key={participant.id}
                             variant={isAssigned ? "default" : "outline"}
                             size="sm"
-                            className="h-auto px-3 py-1 text-sm whitespace-nowrap bg-slate-700/50 border-0 text-slate-100 hover:bg-slate-600 hover:text-slate-100 hover:border-0 transition-all duration-300"
+                            className={`h-auto px-2 py-1 text-sm whitespace-nowrap transition-all duration-300 ${
+                              isAssigned 
+                                ? "bg-gradient-to-r from-emerald-500/80 to-teal-500/80 text-white border-2 border-emerald-400/60 rounded-full shadow-lg hover:shadow-emerald-500/25 hover:scale-105" 
+                                : "bg-gradient-to-r from-slate-600/50 to-slate-700/50 text-slate-200 border-2 border-slate-500/40 rounded-full shadow-md hover:shadow-slate-500/25 hover:scale-105 hover:bg-gradient-to-r hover:from-slate-500/60 hover:to-slate-600/60"
+                            }`}
                             onClick={() => {
                               if (isAssigned) {
                                 removeParticipant(transportItem.id, participant.id)
@@ -528,6 +566,7 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
                               }
                             }}
                           >
+                            {isAssigned && <span className="mr-1">✓</span>}
                             {participant.name}
                           </Button>
                         )
@@ -538,7 +577,7 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
 
                 {/* Editační formulář inline */}
                 {editingId === transportItem.id && (
-                  <div className="mt-2 p-4 border-0 rounded-lg bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm shadow-lg">
+                  <div className="mt-4 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl">
                     <h3 className="font-medium mb-4 text-slate-100">Upravit dopravu</h3>
                     <form onSubmit={handleSubmit(handleSaveEdit)} className="space-y-4">
                       <div className="space-y-4">
@@ -685,11 +724,11 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
                         </div>
                       </div>
 
-                      <div className="flex gap-2">
-                        <Button type="submit" className="bg-slate-800 text-slate-100 border-0 hover:bg-slate-700 hover:text-slate-100 hover:border-0 transition-all duration-300">
+                      <div className="flex gap-3">
+                        <Button type="submit" className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 hover:from-cyan-700 hover:to-blue-700 transition-all duration-300 shadow-lg">
                           Uložit změny
                         </Button>
-                        <Button type="button" variant="outline" onClick={handleCancelEdit} className="bg-slate-800 text-slate-100 border-0 hover:bg-slate-700 hover:text-slate-100 hover:border-0 transition-all duration-300">
+                        <Button type="button" variant="outline" onClick={handleCancelEdit} className="border border-slate-500/50 text-slate-300 bg-slate-700/50 hover:bg-slate-600/50 hover:text-slate-100 hover:border-slate-400/50 transition-all duration-300 shadow-md">
                           Zrušit
                         </Button>
                       </div>
