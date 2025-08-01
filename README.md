@@ -1,270 +1,199 @@
-# 🎉 EventPlanner v1.0 - Stable Version
+# Eventio - Event Planning Application
 
-## 📋 Přehled
+Moderní aplikace pro plánování událostí s pokročilými funkcemi pro správu účastníků, dopravy, inventáře a WANTED sekcí.
 
-EventPlanner je kompletní aplikace pro správu událostí s možností sdílení přes token. Aplikace umožňuje správu účastníků, dopravy, inventáře a audit logů všech změn.
+## 🚀 Funkce
 
-## ✨ Funkce
+- **Správa událostí**: Vytváření a editace událostí s detaily
+- **Účastníci**: Přidávání a správa účastníků události
+- **Doprava**: Plánování dopravních možností a přiřazování účastníků
+- **Inventář**: Sledování předmětů a jejich přiřazení
+- **WANTED sekce**: Seznam předmětů, které je potřeba sehnat
+- **PIN ochrana**: Bezpečnostní systém s PIN kódy pro editaci
+- **Read-only režim**: Prohlížení bez možnosti editace
+- **Rate limiting**: Ochrana proti brute force útokům
 
-### 🎯 Hlavní funkce
-- ✅ **Vytváření událostí** s tokenem pro sdílení
-- ✅ **Správa účastníků** (přidávání, editace, mazání)
-- ✅ **Správa dopravy** (přidávání, editace, mazání, přiřazování účastníků)
-- ✅ **Správa inventáře** (přidávání, editace, mazání, přiřazování účastníků)
-- ✅ **Audit logy** všech změn
-- ✅ **Editace hlavních informací** události
-- ✅ **Responsivní design** pro všechny zařízení
+## 🛠️ Technologie
 
-### 🎨 UI/UX Funkce
-- ✅ **Single-page design** - vše na jedné stránce
-- ✅ **Grid layout** 2x2 pro hlavní sekce
-- ✅ **Dropdown formuláře** pro přidávání
-- ✅ **Inline editace** přímo pod položkami
-- ✅ **Adaptivní velikost tlačítek** podle délky textu
-- ✅ **Ikony** pro lepší orientaci
-- ✅ **Barevné indikátory** stavu (přiřazeno/nepřiřazeno)
+- **Frontend**: Next.js 15, React, TypeScript
+- **Styling**: Tailwind CSS
+- **Databáze**: PostgreSQL
+- **Formuláře**: React Hook Form + Zod
+- **Deployment**: Vercel (doporučeno)
 
-## 🚀 Rychlé spuštění
+## 📋 Požadavky
 
-### Požadavky
-- Node.js 18+
-- PostgreSQL 13+
+- Node.js 18+ 
+- PostgreSQL 12+
+- npm nebo yarn
 
-### 1. Instalace
+## 🚀 Instalace a Deployment
+
+### 1. Klonování repozitáře
 ```bash
-# Klonování repozitáře
-git clone git@github.com:Drexinho/eventio.git
-cd eventio
+git clone https://github.com/Drexinho/Eventio.git
+cd Eventio
+```
 
-# Instalace závislostí
+### 2. Instalace závislostí
+```bash
 npm install
 ```
 
-### 2. Databáze
+### 3. Nastavení databáze
+
+#### PostgreSQL instalace (Ubuntu/Debian)
 ```bash
-# Spuštění PostgreSQL
+sudo apt update
+sudo apt install postgresql postgresql-contrib
 sudo systemctl start postgresql
-
-# Vytvoření databáze a uživatele
-sudo -u postgres psql -c "CREATE USER eventplanner WITH PASSWORD 'your_password';"
-sudo -u postgres psql -c "CREATE DATABASE eventplanner_db OWNER eventplanner;"
-
-# Spuštění schématu
-psql -U eventplanner -d eventplanner_db -f postgresql-schema.sql
+sudo systemctl enable postgresql
 ```
 
-### 3. Konfigurace
+#### Vytvoření databáze a uživatele
 ```bash
-# Vytvoření .env.local
-cat > .env.local << EOF
-DATABASE_URL=postgresql://eventplanner:your_password@localhost:5432/eventplanner_db
-EOF
+sudo -u postgres psql
 ```
 
-### 4. Spuštění
+```sql
+CREATE USER eventplanner WITH PASSWORD 'your_password';
+CREATE DATABASE eventplanner OWNER eventplanner;
+GRANT ALL PRIVILEGES ON DATABASE eventplanner TO eventplanner;
+\q
+```
+
+#### Import schématu
 ```bash
-# Development mode
-npm run dev
-
-# Testování
-curl http://localhost:3000/api/test-db
+sudo -u postgres psql -d eventplanner -f postgresql-schema.sql
 ```
 
-## 📊 Databázová struktura
+### 4. Konfigurace prostředí
 
-### Tabulky
-- **`events`** - Události (název, popis, datum, cena, token)
-- **`participants`** - Účastníci (jméno, poznámky, zůstává celý čas)
-- **`transport`** - Doprava (typ, místa, čas, kapacita, cena, mezizastávky)
-- **`transport_assignments`** - Přiřazení účastníků k dopravě
-- **`inventory_items`** - Inventář (název, množství, přiřazení)
-- **`audit_logs`** - Audit logy všech změn
+Vytvořte soubor `.env.local`:
+```env
+DATABASE_URL=postgresql://eventplanner:your_password@localhost:5432/eventplanner
+```
 
-## 🔧 API Endpoints
+### 5. Spuštění aplikace
 
-### Události
-- `GET /api/events/[token]` - Získat událost
-- `PUT /api/events/[token]` - Upravit událost
-
-### Účastníci
-- `GET /api/events/[token]/participants` - Seznam účastníků
-- `POST /api/events/[token]/participants` - Přidat účastníka
-- `PUT /api/events/[token]/participants/[id]` - Upravit účastníka
-- `DELETE /api/events/[token]/participants/[id]` - Smazat účastníka
-
-### Doprava
-- `GET /api/events/[token]/transport` - Seznam dopravy
-- `POST /api/events/[token]/transport` - Přidat dopravu
-- `PUT /api/events/[token]/transport/[id]` - Upravit dopravu
-- `DELETE /api/events/[token]/transport/[id]` - Smazat dopravu
-- `POST /api/events/[token]/transport/assign` - Přiřadit účastníka
-- `DELETE /api/events/[token]/transport/assign` - Odebrat účastníka
-
-### Inventář
-- `GET /api/events/[token]/inventory` - Seznam inventáře
-- `POST /api/events/[token]/inventory` - Přidat položku
-- `PUT /api/events/[token]/inventory/[id]` - Upravit položku
-- `DELETE /api/events/[token]/inventory/[id]` - Smazat položku
-
-### Audit logy
-- `GET /api/events/[token]/audit-logs` - Seznam audit logů
-
-## 🎯 Klíčové funkce
-
-### 1. Správa účastníků
-- ✅ **Přidávání** účastníků s jménem a poznámkami
-- ✅ **Editace** existujících účastníků
-- ✅ **Mazání** účastníků
-- ✅ **Indikace** zda zůstává celý čas
-- ✅ **Poznámky** pro každého účastníka
-
-### 2. Správa dopravy
-- ✅ **Přidávání** dopravy s detaily (typ, místa, čas, kapacita, cena)
-- ✅ **Editace** existující dopravy
-- ✅ **Mazání** dopravy
-- ✅ **Přiřazování/odebírání** účastníků
-- ✅ **Mezizastávky** s časem a poznámkami
-- ✅ **Výpočet ceny** na jednoho účastníka
-- ✅ **Poznámky** pro dopravu
-
-### 3. Správa inventáře
-- ✅ **Přidávání** položek s množstvím
-- ✅ **Editace** existujících položek
-- ✅ **Mazání** položek
-- ✅ **Přiřazování** účastníků k položkám
-- ✅ **Poznámky** pro položky
-
-### 4. Audit systém
-- ✅ **Logování** všech změn (INSERT, UPDATE, DELETE)
-- ✅ **Historie** s detaily změn
-- ✅ **Předchozí a nové hodnoty** v JSON formátu
-
-## 🎨 UI Komponenty
-
-### Layout
-- ✅ **Single-page design** - vše na jedné stránce
-- ✅ **Grid layout** 2x2 pro sekce (Participants+Transport, Inventory+Audit)
-- ✅ **Obrázek události** vpravo (60% velikost)
-- ✅ **Základní informace** vlevo (název, datum, popis, cena)
-
-### Formuláře
-- ✅ **Dropdown design** - skryté do kliknutí na +
-- ✅ **Inline editace** - formulář pod položkou
-- ✅ **Validace** s chybovými zprávami
-- ✅ **Automatické zavírání** po úspěšném přidání
-
-### Tlačítka a interakce
-- ✅ **Adaptivní velikost** podle délky textu
-- ✅ **Barevné indikátory** stavu (přiřazeno/nepřiřazeno)
-- ✅ **Ikony** pro lepší UX
-- ✅ **Potvrzovací dialogy** pro mazání
-
-## 🔧 Technické detaily
-
-### Frontend
-- ✅ **Next.js 15** s App Router
-- ✅ **TypeScript** pro typovou bezpečnost
-- ✅ **Tailwind CSS** pro styling
-- ✅ **React Hook Form** pro formuláře
-- ✅ **Zod** pro validaci
-
-### Backend
-- ✅ **PostgreSQL** databáze
-- ✅ **pg** Node.js klient
-- ✅ **Next.js API Routes**
-- ✅ **Audit triggers** v databázi
-
-### Deployment
-- ✅ **Lokální PostgreSQL** instance
-- ✅ **Environment variables** pro konfiguraci
-- ✅ **Error handling** na všech úrovních
-
-## 🚀 Deployment
-
-### Lokální spuštění
+#### Vývojový režim
 ```bash
 npm run dev
 ```
+Aplikace bude dostupná na `http://localhost:3000`
 
-### Produkční nasazení
+#### Produkční build
 ```bash
-# Build aplikace
 npm run build
-
-# Spuštění s PM2
-npm install -g pm2
-pm2 start npm --name "eventplanner" -- start
-pm2 startup
-pm2 save
+npm start
 ```
 
-### Nginx konfigurace (volitelně)
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
+## 🔧 Konfigurace
+
+### Databázové schéma
+Schéma je definováno v `postgresql-schema.sql` a obsahuje:
+- Tabulky pro události, účastníky, dopravu, inventář
+- WANTED sekci pro předměty k sehnání
+- Audit logy pro sledování změn
+- Indexy pro optimalizaci výkonu
+
+### Bezpečnostní funkce
+- **PIN systém**: 4-místné PIN kódy pro editaci událostí
+- **Rate limiting**: 5 pokusů na 10 minut pro PIN ověření
+- **Read-only režim**: Prohlížení bez možnosti editace
+- **Hash-based přístup**: 20-znakové hashe pro URL
+
+## 📱 Použití
+
+### Vytvoření události
+1. Přejděte na hlavní stránku
+2. Klikněte na "Vytvořit událost"
+3. Vyplňte údaje a vygenerujte odkaz + PIN
+4. Sdílejte odkaz s účastníky
+
+### Připojení k události
+- **Přes odkaz**: Automaticky read-only režim
+- **Přes PIN**: Možnost editace po zadání PIN kódu
+
+### WANTED sekce
+- Přidávání předmětů k sehnání
+- Označení "Mám" a přesun do inventáře
+- Editace a mazání položek
+
+## 🔒 Bezpečnost
+
+- Všechny API endpointy jsou chráněny
+- Rate limiting na PIN ověření
+- Validace vstupů pomocí Zod
+- SQL injection ochrana přes parametrizované dotazy
+
+## 🚀 Deployment na Vercel
+
+### 1. Připravte aplikaci
+```bash
+npm run build
 ```
 
-## 🎯 Výhody této verze
+### 2. Vercel CLI
+```bash
+npm i -g vercel
+vercel login
+vercel
+```
 
-### 1. Robustnost
-- ✅ **Kompletní CRUD** operace pro všechny entity
-- ✅ **Audit logging** všech změn
-- ✅ **Error handling** s uživatelskými zprávami
-- ✅ **Type safety** TypeScript
+### 3. Environment variables na Vercel
+Nastavte `DATABASE_URL` v Vercel dashboardu.
 
-### 2. UX/UI
-- ✅ **Intuitivní design** s ikonami
-- ✅ **Responsivní layout** pro všechna zařízení
-- ✅ **Adaptivní tlačítka** podle obsahu
-- ✅ **Vizuální feedback** pro všechny akce
+### 4. Databáze pro produkci
+Doporučujeme použít:
+- **Vercel Postgres** (integrované řešení)
+- **Neon** (serverless PostgreSQL)
+- **Supabase** (open source alternativa)
 
-### 3. Funkčnost
-- ✅ **Kompletní workflow** pro správu událostí
-- ✅ **Flexibilní přiřazování** účastníků
-- ✅ **Detailní audit** všech změn
-- ✅ **Poznámky** pro všechny entity
+## 📊 Monitoring
 
-## 📝 Poznámky
+Aplikace loguje:
+- Databázové dotazy s časováním
+- API požadavky
+- Chyby a výjimky
+- Rate limiting události
 
-### ✅ Stabilní funkce
-- Všechny CRUD operace fungují
-- Audit logging je kompletní
-- UI je responsivní a intuitivní
-- Error handling je robustní
+## 🐛 Řešení problémů
 
-### 🔄 Možná vylepšení pro v2.0
-- Notifikace pro uživatele
-- Export dat do PDF/Excel
-- Kalendářní view
-- Offline funkcionalita
-- Multi-language podpora
+### Databáze se nepřipojuje
+```bash
+sudo systemctl status postgresql
+sudo -u postgres psql -c "SELECT version();"
+```
 
-## 🎉 Závěr
+### Port 3000 je obsazený
+```bash
+lsof -i :3000
+kill -9 <PID>
+```
 
-**EventPlanner v1.0** je kompletní, stabilní aplikace pro správu událostí s:
-- ✅ **Kompletní funkcionalitou** pro správu účastníků, dopravy a inventáře
-- ✅ **Intuitivním UI** s adaptivními tlačítky a vizuálními indikátory
-- ✅ **Robustním backendem** s PostgreSQL a audit loggingem
-- ✅ **Responsivním designem** pro všechna zařízení
+### Build chyby
+```bash
+rm -rf .next
+npm run build
+```
 
-**Aplikace je připravena k produkčnímu nasazení!** 🚀
+## 📝 License
+
+MIT License - viz LICENSE soubor
+
+## 🤝 Contributing
+
+1. Fork repozitáře
+2. Vytvořte feature branch
+3. Commit změny
+4. Push do branch
+5. Otevřete Pull Request
+
+## 📞 Support
+
+Pro podporu kontaktujte autora nebo otevřete issue na GitHubu.
 
 ---
 
-## 📞 Podpora
-
-Pro problémy nebo dotazy vytvořte issue v GitHub repozitáři: https://github.com/Drexinho/eventio
+**Eventio** - Moderní řešení pro plánování událostí

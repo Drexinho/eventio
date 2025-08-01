@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createEvent } from '@/lib/database'
-import { generateUUID, generatePIN } from '@/lib/utils'
+import { generateHash, generate4DigitPIN } from '@/lib/utils'
 
 const createEventSchema = z.object({
   name: z.string().min(1, 'Název události je povinný'),
@@ -21,7 +21,7 @@ const createEventSchema = z.object({
   end_date: z.string().min(1, 'Datum konce je povinné'),
   max_participants: z.number().min(1, 'Maximální počet účastníků musí být alespoň 1'),
   price: z.number().min(0, 'Cena nemůže být záporná'),
-  access_type: z.enum(['link', 'pin']),
+  pin_code: z.string().length(4, 'PIN musí mít přesně 4 číslice').regex(/^\d{4}$/, 'PIN musí obsahovat pouze číslice'),
   map_link: z.string().optional(),
   booking_link: z.string().optional(),
   image_url: z.string().optional()
@@ -32,34 +32,37 @@ type CreateEventFormData = z.infer<typeof createEventSchema>
 export function CreateEventForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [generatedToken, setGeneratedToken] = useState<string>('')
+  const [generatedHash, setGeneratedHash] = useState<string>('')
 
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors }
   } = useForm<CreateEventFormData>({
     resolver: zodResolver(createEventSchema),
     defaultValues: {
-      access_type: 'link'
+      pin_code: generate4DigitPIN()
     }
   })
 
-  const accessType = watch('access_type')
+  const generateEventHash = () => {
+    const hash = generateHash()
+    setGeneratedHash(hash)
+    return hash
+  }
 
-  const generateToken = () => {
-    const token = accessType === 'link' ? generateUUID() : generatePIN()
-    setGeneratedToken(token)
-    return token
+  const generatePIN = () => {
+    const pin = generate4DigitPIN()
+    setValue('pin_code', pin)
+    return pin
   }
 
   const onSubmit = async (data: CreateEventFormData) => {
     setIsLoading(true)
     
     try {
-      const token = generatedToken || generateToken()
+      const hash = generatedHash || generateEventHash()
       
       const eventData = {
         name: data.name,
@@ -68,8 +71,9 @@ export function CreateEventForm() {
         end_date: data.end_date,
         max_participants: data.max_participants,
         price: data.price,
-        access_type: data.access_type,
-        access_token: token,
+        access_type: 'pin',
+        access_token: hash,
+        pin_code: data.pin_code,
         map_link: data.map_link || null,
         booking_link: data.booking_link || null,
         image_url: data.image_url || null
@@ -244,35 +248,32 @@ export function CreateEventForm() {
             </div>
           </div>
 
-          {/* Typ přístupu */}
+          {/* PIN kód pro editaci */}
           <div className="space-y-2">
-            <Label htmlFor="access_type">Typ přístupu *</Label>
-            <Select
-              value={accessType}
-              onValueChange={(value: 'link' | 'pin') => {
-                setValue('access_type', value)
-                setGeneratedToken('')
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Vyberte typ přístupu" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="link">Unikátní odkaz (URL)</SelectItem>
-                <SelectItem value="pin">9-místný PIN kód</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.access_type && (
-              <p className="text-sm text-red-500">{errors.access_type.message}</p>
+            <Label htmlFor="pin_code">PIN kód pro editaci (4 číslice) *</Label>
+            <Input
+              id="pin_code"
+              {...register('pin_code')}
+              placeholder="1234"
+              maxLength={4}
+            />
+            <p className="text-sm text-muted-foreground">
+              Tento PIN bude potřeba pro úpravu události
+            </p>
+            {errors.pin_code && (
+              <p className="text-sm text-red-500">{errors.pin_code.message}</p>
             )}
           </div>
 
-          {/* Vygenerovaný token */}
-          {generatedToken && (
+          {/* Vygenerovaný hash */}
+          {generatedHash && (
             <div className="p-4 bg-muted rounded-lg">
-              <Label className="text-sm font-medium">Vygenerovaný {accessType === 'link' ? 'odkaz' : 'PIN'}:</Label>
+              <Label className="text-sm font-medium">Vygenerovaný odkaz:</Label>
               <p className="text-lg font-mono bg-background p-2 rounded mt-1 break-all">
-                {accessType === 'link' ? `${window.location.origin}/event/${generatedToken}` : generatedToken}
+                {`${window.location.origin}/event/${generatedHash}`}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Tento odkaz můžete sdílet s účastníky. Pro editaci bude potřeba PIN kód.
               </p>
             </div>
           )}
@@ -283,12 +284,12 @@ export function CreateEventForm() {
               type="button"
               variant="outline"
               onClick={() => {
-                const token = generateToken()
-                setGeneratedToken(token)
+                generateEventHash()
+                generatePIN()
               }}
               disabled={isLoading}
             >
-              Vygenerovat {accessType === 'link' ? 'odkaz' : 'PIN'}
+              Vygenerovat odkaz a PIN
             </Button>
             
             <Button type="submit" disabled={isLoading}>

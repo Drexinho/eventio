@@ -5,6 +5,21 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Generování 20-znakového hashe pro URL
+export const generateHash = (): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = ''
+  for (let i = 0; i < 20; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
+}
+
+// Generování 4-místného PIN kódu
+export const generate4DigitPIN = (): string => {
+  return Math.floor(1000 + Math.random() * 9000).toString()
+}
+
 // Generování UUID pro URL přístup
 export const generateUUID = (): string => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -22,6 +37,11 @@ export const generatePIN = (): string => {
 // Validace PIN kódu (9 číslic)
 export const isValidPIN = (pin: string): boolean => {
   return /^\d{9}$/.test(pin)
+}
+
+// Validace 4-místného PIN kódu
+export const isValid4DigitPIN = (pin: string): boolean => {
+  return /^\d{4}$/.test(pin)
 }
 
 // Formátování ceny

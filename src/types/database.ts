@@ -8,6 +8,7 @@ export interface Event {
   price: number
   access_type: 'link' | 'pin'
   access_token: string
+  pin_code: string | null
   map_link: string | null
   booking_link: string | null
   image_url: string | null
@@ -62,6 +63,15 @@ export interface InventoryItem {
   assigned_to: string | null
   assigned_participant_name: string | null
   notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface WantedItem {
+  id: string
+  event_id: string
+  name: string
+  note: string | null
   created_at: string
   updated_at: string
 }

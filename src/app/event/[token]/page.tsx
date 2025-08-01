@@ -22,7 +22,7 @@ export default function EventPage({ params }: EventPageProps) {
   const [eventToken, setEventToken] = useState<string>('')
   const [participantsCount, setParticipantsCount] = useState<number>(0)
   const [paymentStatus, setPaymentStatus] = useState<'paid' | 'unpaid'>(event?.payment_status || 'unpaid')
-  const [wantedItems, setWantedItems] = useState<{name: string, note?: string}[]>([])
+  const [wantedItems, setWantedItems] = useState<{id: string, name: string, note?: string}[]>([])
   const [newWantedItem, setNewWantedItem] = useState<string>('')
   const [showAssignModal, setShowAssignModal] = useState(false)
   const [selectedWantedItem, setSelectedWantedItem] = useState<string>('')
@@ -62,6 +62,19 @@ export default function EventPage({ params }: EventPageProps) {
     }
   }
 
+  // Funkce pro načítání WANTED položek
+  const loadWantedItems = async (token: string) => {
+    try {
+      const response = await fetch(`/api/events/${token}/wanted`)
+      if (response.ok) {
+        const items = await response.json()
+        setWantedItems(items)
+      }
+    } catch (error) {
+      console.error('Chyba při načítání wanted položek:', error)
+    }
+  }
+
   useEffect(() => {
     const loadEvent = async () => {
       try {
@@ -86,6 +99,8 @@ export default function EventPage({ params }: EventPageProps) {
         
         // Načíst počet účastníků
         await loadParticipantsCount(token)
+        // Načíst WANTED položky
+        await loadWantedItems(token)
         // Načíst účastníky pro modal
         const participantsResponse = await fetch(`/api/events/${token}/participants`)
         if (participantsResponse.ok) {
@@ -177,8 +192,20 @@ export default function EventPage({ params }: EventPageProps) {
       })
 
       if (response.ok) {
-        // Odebrat z wanted items
-        setWantedItems(wantedItems.filter(item => item.name !== selectedWantedItem))
+        // Odebrat z wanted items - najít položku podle jména a smazat ji
+        const itemToRemove = wantedItems.find(item => item.name === selectedWantedItem)
+        if (itemToRemove) {
+          try {
+            const deleteResponse = await fetch(`/api/events/${eventToken}/wanted?id=${itemToRemove.id}`, {
+              method: 'DELETE',
+            })
+            if (deleteResponse.ok) {
+              await loadWantedItems(eventToken)
+            }
+          } catch (error) {
+            console.error('Chyba při mazání wanted položky:', error)
+          }
+        }
         setShowAssignModal(false)
         setSelectedWantedItem('')
         setSelectedParticipant('')
@@ -189,36 +216,56 @@ export default function EventPage({ params }: EventPageProps) {
     }
   }
 
-  const handleHaveItem = async (item: string) => {
-    setSelectedWantedItem(item)
-    setShowAssignModal(true)
-    
-    // Načíst účastníky pro modal
-    try {
-      const response = await fetch(`/api/events/${eventToken}/participants`)
-      if (response.ok) {
-        const participantsData = await response.json()
-        setParticipants(participantsData)
+  const handleHaveItem = async (itemId: string) => {
+    const item = wantedItems.find(w => w.id === itemId)
+    if (item) {
+      setSelectedWantedItem(item.name)
+      setShowAssignModal(true)
+      
+      // Načíst účastníky pro modal
+      try {
+        const response = await fetch(`/api/events/${eventToken}/participants`)
+        if (response.ok) {
+          const participantsData = await response.json()
+          setParticipants(participantsData)
+        }
+      } catch (error) {
+        console.error('Chyba při načítání účastníků:', error)
       }
-    } catch (error) {
-      console.error('Chyba při načítání účastníků:', error)
     }
   }
 
-  const handleEditItem = (index: number, item: {name: string, note?: string}) => {
+  const handleEditItem = (index: number, item: {id: string, name: string, note?: string}) => {
     setEditingWantedItemIndex(index)
     setEditItemName(item.name)
     setEditItemNote(item.note || '')
   }
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editingWantedItemIndex === null || !editItemName.trim()) return
 
-    setWantedItems(wantedItems.map((item, index) => 
-      index === editingWantedItemIndex 
-        ? { name: editItemName.trim(), note: editItemNote.trim() || undefined }
-        : item
-    ))
+    const itemToEdit = wantedItems[editingWantedItemIndex]
+    if (!itemToEdit) return
+
+    try {
+      const response = await fetch(`/api/events/${eventToken}/wanted`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: itemToEdit.id,
+          name: editItemName.trim(),
+          note: editItemNote.trim() || null
+        }),
+      })
+
+      if (response.ok) {
+        await loadWantedItems(eventToken)
+      }
+    } catch (error) {
+      console.error('Chyba při aktualizaci wanted položky:', error)
+    }
     
     setEditingWantedItemIndex(null)
     setEditItemName('')
@@ -576,20 +623,54 @@ export default function EventPage({ params }: EventPageProps) {
                      onChange={(e) => setNewWantedItem(e.target.value)}
                      placeholder="Napište co potřebujete sehnat..."
                      className="flex-1 bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 focus:bg-slate-700/50 transition-all duration-300"
-                     onKeyPress={(e) => {
+                     onKeyPress={async (e) => {
                        if (e.key === 'Enter' && newWantedItem.trim()) {
-                         setWantedItems([...wantedItems, {name: newWantedItem.trim(), note: wantedItemNote.trim() || undefined}])
-                         setNewWantedItem('')
-                         setWantedItemNote('')
+                         try {
+                           const response = await fetch(`/api/events/${eventToken}/wanted`, {
+                             method: 'POST',
+                             headers: {
+                               'Content-Type': 'application/json',
+                             },
+                             body: JSON.stringify({
+                               name: newWantedItem.trim(),
+                               note: wantedItemNote.trim() || null
+                             }),
+                           })
+
+                           if (response.ok) {
+                             await loadWantedItems(eventToken)
+                             setNewWantedItem('')
+                             setWantedItemNote('')
+                           }
+                         } catch (error) {
+                           console.error('Chyba při přidávání wanted položky:', error)
+                         }
                        }
                      }}
                    />
                    <Button
-                     onClick={() => {
+                     onClick={async () => {
                        if (newWantedItem.trim()) {
-                         setWantedItems([...wantedItems, {name: newWantedItem.trim(), note: wantedItemNote.trim() || undefined}])
-                         setNewWantedItem('')
-                         setWantedItemNote('')
+                         try {
+                           const response = await fetch(`/api/events/${eventToken}/wanted`, {
+                             method: 'POST',
+                             headers: {
+                               'Content-Type': 'application/json',
+                             },
+                             body: JSON.stringify({
+                               name: newWantedItem.trim(),
+                               note: wantedItemNote.trim() || null
+                             }),
+                           })
+
+                           if (response.ok) {
+                             await loadWantedItems(eventToken)
+                             setNewWantedItem('')
+                             setWantedItemNote('')
+                           }
+                         } catch (error) {
+                           console.error('Chyba při přidávání wanted položky:', error)
+                         }
                        }
                      }}
                      className="bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 hover:from-amber-700 hover:to-orange-700 transition-all duration-300 shadow-lg"
@@ -668,7 +749,7 @@ export default function EventPage({ params }: EventPageProps) {
                         {!isReadOnly && (
                           <div className="flex gap-2">
                             <Button
-                              onClick={() => handleHaveItem(item.name)}
+                              onClick={() => handleHaveItem(item.id)}
                               variant="outline"
                               size="sm"
                               className="bg-slate-800/50 border border-green-400 text-green-400 hover:bg-green-600/20 hover:text-green-300 transition-all duration-300"
@@ -684,7 +765,19 @@ export default function EventPage({ params }: EventPageProps) {
                               ✏️
                             </Button>
                             <Button
-                              onClick={() => setWantedItems(wantedItems.filter((_, i) => i !== index))}
+                              onClick={async () => {
+                  try {
+                    const response = await fetch(`/api/events/${eventToken}/wanted?id=${item.id}`, {
+                      method: 'DELETE',
+                    })
+
+                    if (response.ok) {
+                      await loadWantedItems(eventToken)
+                    }
+                  } catch (error) {
+                    console.error('Chyba při mazání wanted položky:', error)
+                  }
+                }}
                               variant="outline"
                               size="sm"
                               className="bg-slate-800/50 border border-red-400 text-red-400 hover:bg-red-600/20 hover:text-red-300 transition-all duration-300"

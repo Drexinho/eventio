@@ -1,5 +1,5 @@
 import { query, transaction } from './postgresql'
-import type { Event, Participant, Transport, InventoryItem, AuditLog } from '@/types/database'
+import type { Event, Participant, Transport, InventoryItem, AuditLog, WantedItem } from '@/types/database'
 
 // Funkce pro získání události podle PIN kódu
 export const getEventByPin = async (pin: string): Promise<any> => {
@@ -17,8 +17,8 @@ export const getEventByPin = async (pin: string): Promise<any> => {
 // Event funkce
 export const createEvent = async (eventData: Omit<Event, 'id' | 'created_at'>) => {
   const result = await query(`
-    INSERT INTO events (name, description, start_date, end_date, max_participants, price, access_type, access_token, map_link, booking_link, image_url, payment_status)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    INSERT INTO events (name, description, start_date, end_date, max_participants, price, access_type, access_token, pin_code, map_link, booking_link, image_url, payment_status)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
     RETURNING *
   `, [
     eventData.name,
@@ -29,6 +29,7 @@ export const createEvent = async (eventData: Omit<Event, 'id' | 'created_at'>) =
     eventData.price,
     eventData.access_type,
     eventData.access_token,
+    eventData.pin_code,
     eventData.map_link,
     eventData.booking_link,
     eventData.image_url,
@@ -309,9 +310,73 @@ export const getAuditLogs = async (eventId: string) => {
 // Utility funkce pro testování připojení
 export const testConnection = async () => {
   try {
-    const result = await query('SELECT NOW() as current_time')
-    return { success: true, time: result.rows[0].current_time }
+    const result = await query('SELECT NOW()')
+    return result.rows[0]
   } catch (error) {
-    return { success: false, error: (error as Error).message }
+    throw new Error('Databázové připojení selhalo')
   }
+}
+
+// Wanted Items funkce
+export const getWantedItems = async (accessToken: string) => {
+  const result = await query(`
+    SELECT wi.* FROM wanted_items wi
+    JOIN events e ON wi.event_id = e.id
+    WHERE e.access_token = $1 
+    ORDER BY wi.created_at ASC
+  `, [accessToken])
+
+  return result.rows
+}
+
+export const addWantedItem = async (accessToken: string, itemData: Omit<WantedItem, 'id' | 'event_id' | 'created_at' | 'updated_at'>) => {
+  // Nejprve získat event_id z access_token
+  const eventResult = await query(`
+    SELECT id FROM events WHERE access_token = $1
+  `, [accessToken])
+
+  if (eventResult.rows.length === 0) {
+    throw new Error('Událost nebyla nalezena')
+  }
+
+  const eventId = eventResult.rows[0].id
+
+  const result = await query(`
+    INSERT INTO wanted_items (event_id, name, note)
+    VALUES ($1, $2, $3)
+    RETURNING *
+  `, [eventId, itemData.name, itemData.note])
+  return result.rows[0]
+}
+
+export const updateWantedItem = async (id: string, updates: Partial<WantedItem>) => {
+  const fields = Object.keys(updates).filter(key => key !== 'id' && key !== 'event_id' && key !== 'created_at' && key !== 'updated_at')
+  const values = Object.values(updates).filter((_, index) => fields[index])
+  
+  if (fields.length === 0) {
+    throw new Error('Žádné pole k aktualizaci')
+  }
+
+  const setClause = fields.map((field, index) => `${field} = $${index + 2}`).join(', ')
+  const result = await query(`
+    UPDATE wanted_items SET ${setClause} WHERE id = $1 RETURNING *
+  `, [id, ...values])
+
+  if (result.rows.length === 0) {
+    throw new Error('Wanted položka nebyla nalezena')
+  }
+
+  return result.rows[0]
+}
+
+export const deleteWantedItem = async (id: string) => {
+  const result = await query(`
+    DELETE FROM wanted_items WHERE id = $1 RETURNING *
+  `, [id])
+
+  if (result.rows.length === 0) {
+    throw new Error('Wanted položka nebyla nalezena')
+  }
+
+  return result.rows[0]
 }
