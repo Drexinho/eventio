@@ -45,6 +45,11 @@ export function checkRateLimit(ip: string): { allowed: boolean; remaining: numbe
   }
 }
 
+// Funkce pro reset rate-limit systému
+export function resetRateLimit(): void {
+  rateLimitStore.clear()
+}
+
 // Čištění starých záznamů každých 10 minut
 setInterval(() => {
   const now = Date.now()

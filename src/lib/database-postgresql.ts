@@ -1,6 +1,19 @@
 import { query, transaction } from './postgresql'
 import type { Event, Participant, Transport, InventoryItem, AuditLog } from '@/types/database'
 
+// Funkce pro získání události podle PIN kódu
+export const getEventByPin = async (pin: string): Promise<any> => {
+  const result = await query(`
+    SELECT * FROM events WHERE pin_code = $1
+  `, [pin])
+
+  if (result.rows.length === 0) {
+    throw new Error('Událost nebyla nalezena')
+  }
+
+  return result.rows[0]
+}
+
 // Event funkce
 export const createEvent = async (eventData: Omit<Event, 'id' | 'created_at'>) => {
   const result = await query(`

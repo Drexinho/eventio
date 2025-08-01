@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getEventByPin } from '@/lib/database-postgresql'
+import { getEventByPin } from '../../../../lib/database-postgresql'
 import { checkRateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
@@ -36,9 +36,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (pin.length !== 6) {
+    if (pin.length !== 4) {
       return NextResponse.json(
-        { message: 'PIN musí mít přesně 6 znaků' },
+        { message: 'PIN musí mít přesně 4 znaky' },
         { status: 400 }
       )
     }

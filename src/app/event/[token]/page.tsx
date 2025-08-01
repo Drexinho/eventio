@@ -33,6 +33,12 @@ export default function EventPage({ params }: EventPageProps) {
   const [editingWantedItemIndex, setEditingWantedItemIndex] = useState<number | null>(null)
   const [editItemName, setEditItemName] = useState<string>('')
   const [editItemNote, setEditItemNote] = useState<string>('')
+  const [isReadOnly, setIsReadOnly] = useState(true)
+  const [showPinModal, setShowPinModal] = useState(false)
+  const [pinInput, setPinInput] = useState('')
+  const [pinError, setPinError] = useState('')
+  const [pinAttempts, setPinAttempts] = useState(0)
+  const [isPinValidating, setIsPinValidating] = useState(false)
   
   // Filtr pro zobrazování sekcí
   const [visibleSections, setVisibleSections] = useState({
@@ -70,6 +76,13 @@ export default function EventPage({ params }: EventPageProps) {
         const eventData = await response.json()
         setEvent(eventData)
         setPaymentStatus(eventData.payment_status || 'unpaid')
+        
+        // Zobrazit PIN modal pokud má událost PIN kód
+        if (eventData.pin_code) {
+          setShowPinModal(true)
+        } else {
+          setIsReadOnly(false) // Pokud nemá PIN, povolit editaci
+        }
         
         // Načíst počet účastníků
         await loadParticipantsCount(token)
@@ -218,6 +231,52 @@ export default function EventPage({ params }: EventPageProps) {
     setEditItemNote('')
   }
 
+  const handlePinSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!pinInput.trim()) {
+      setPinError('Zadejte PIN')
+      return
+    }
+
+    setIsPinValidating(true)
+    setPinError('')
+
+    try {
+      const response = await fetch('/api/events/verify-pin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          pin: pinInput.trim(),
+          eventToken: eventToken
+        }),
+      })
+
+      if (response.ok) {
+        setIsReadOnly(false)
+        setShowPinModal(false)
+        setPinInput('')
+        setPinError('')
+        setPinAttempts(0)
+      } else {
+        const errorData = await response.json()
+        setPinAttempts(prev => prev + 1)
+        
+        if (pinAttempts >= 2) { // 3 pokusy (0, 1, 2)
+          setPinError('Příliš mnoho neúspěšných pokusů. Můžete pokračovat v read-only režimu.')
+          // Modal se nezavírá automaticky - uživatel si může vybrat
+        } else {
+          setPinError(errorData.message || 'Nesprávný PIN')
+        }
+      }
+    } catch (error) {
+      setPinError('Nepodařilo se ověřit PIN')
+    } finally {
+      setIsPinValidating(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -266,6 +325,106 @@ export default function EventPage({ params }: EventPageProps) {
 
   return (
     <div className="min-h-screen">
+      {/* PIN Modal */}
+      {showPinModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md border border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-2xl">
+            <CardHeader className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-4 shadow-xl">
+                <span className="text-2xl">🔒</span>
+              </div>
+              <CardTitle className="text-2xl font-bold text-white">
+                Přístup k editaci
+              </CardTitle>
+              <CardDescription className="text-slate-300">
+                Zadejte PIN kód pro úpravu události
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handlePinSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="pin" className="block text-sm font-medium text-slate-300 mb-2">
+                    PIN kód
+                  </label>
+                  <Input
+                    id="pin"
+                    type="password"
+                    value={pinInput}
+                    onChange={(e) => setPinInput(e.target.value)}
+                    placeholder="Zadejte 4-místný PIN"
+                    className="w-full bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 focus:bg-slate-700/50 transition-all duration-300"
+                    disabled={isPinValidating}
+                    maxLength={4}
+                  />
+                </div>
+
+                {pinError && (
+                  <div className="text-red-400 text-sm text-center p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
+                    {pinError}
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  {/* Normální PIN formulář */}
+                  <div className="flex gap-3">
+                    <Button
+                      type="submit"
+                      disabled={isPinValidating || !pinInput.trim()}
+                      className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0 hover:shadow-lg transition-all duration-300"
+                    >
+                      {isPinValidating ? (
+                        <div className="flex items-center">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                          Ověřuji...
+                        </div>
+                      ) : (
+                        <>
+                          <span className="mr-2">🔓</span>
+                          Ověřit PIN
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowPinModal(false)
+                        setPinInput('')
+                        setPinError('')
+                        setPinAttempts(0)
+                      }}
+                      className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300"
+                    >
+                      Zrušit
+                    </Button>
+                  </div>
+
+                  {/* Tlačítko pro pokračování v read-only - dostupné vždy */}
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setShowPinModal(false)
+                      setPinInput('')
+                      setPinError('')
+                      setPinAttempts(0)
+                      setIsReadOnly(true) // Zůstane v read-only režimu
+                    }}
+                    className="w-full bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white border-0 hover:shadow-lg transition-all duration-300"
+                  >
+                    <span className="mr-2">👁️</span>
+                    Pokračovat v read-only režimu
+                  </Button>
+
+                  <div className="text-center text-sm text-slate-400">
+                    {3 - pinAttempts > 0 ? `Zbývající pokusy: ${3 - pinAttempts}` : 'Pokusy vypršely'}
+                  </div>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <div className="container mx-auto p-4">
         {/* Hero Card */}
         <Card className="mb-8 border border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-2xl">
@@ -279,13 +438,30 @@ export default function EventPage({ params }: EventPageProps) {
                   📅 {new Date(event.start_date).toLocaleDateString('cs-CZ')} - {new Date(event.end_date).toLocaleDateString('cs-CZ')}
                 </CardDescription>
               </div>
-              <Button 
-                variant="outline" 
-                onClick={() => setIsEditing(true)}
-                className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-              >
-                ✏️ Upravit
-              </Button>
+              <div className="flex gap-3">
+                {!isReadOnly ? (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsEditing(true)}
+                    className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                  >
+                    ✏️ Upravit
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowPinModal(true)
+                      setPinInput('')
+                      setPinError('')
+                      setPinAttempts(0)
+                    }}
+                    className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                  >
+                    🔓 Zadat PIN pro edit
+                  </Button>
+                )}
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -393,39 +569,43 @@ export default function EventPage({ params }: EventPageProps) {
             <CardContent className="pt-0">
                            {/* Přidání nového itemu */}
              <div className="space-y-3 mb-4">
-               <div className="flex gap-3">
+               {!isReadOnly && (
+                 <div className="flex gap-3">
+                   <Input
+                     value={newWantedItem}
+                     onChange={(e) => setNewWantedItem(e.target.value)}
+                     placeholder="Napište co potřebujete sehnat..."
+                     className="flex-1 bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 focus:bg-slate-700/50 transition-all duration-300"
+                     onKeyPress={(e) => {
+                       if (e.key === 'Enter' && newWantedItem.trim()) {
+                         setWantedItems([...wantedItems, {name: newWantedItem.trim(), note: wantedItemNote.trim() || undefined}])
+                         setNewWantedItem('')
+                         setWantedItemNote('')
+                       }
+                     }}
+                   />
+                   <Button
+                     onClick={() => {
+                       if (newWantedItem.trim()) {
+                         setWantedItems([...wantedItems, {name: newWantedItem.trim(), note: wantedItemNote.trim() || undefined}])
+                         setNewWantedItem('')
+                         setWantedItemNote('')
+                       }
+                     }}
+                     className="bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 hover:from-amber-700 hover:to-orange-700 transition-all duration-300 shadow-lg"
+                   >
+                     Přidat
+                   </Button>
+                 </div>
+               )}
+               {!isReadOnly && (
                  <Input
-                   value={newWantedItem}
-                   onChange={(e) => setNewWantedItem(e.target.value)}
-                   placeholder="Napište co potřebujete sehnat..."
-                   className="flex-1 bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 focus:bg-slate-700/50 transition-all duration-300"
-                   onKeyPress={(e) => {
-                     if (e.key === 'Enter' && newWantedItem.trim()) {
-                       setWantedItems([...wantedItems, {name: newWantedItem.trim(), note: wantedItemNote.trim() || undefined}])
-                       setNewWantedItem('')
-                       setWantedItemNote('')
-                     }
-                   }}
+                   value={wantedItemNote}
+                   onChange={(e) => setWantedItemNote(e.target.value)}
+                   placeholder="Poznámka (volitelně)..."
+                   className="w-full bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 focus:bg-slate-700/50 transition-all duration-300"
                  />
-                 <Button
-                   onClick={() => {
-                     if (newWantedItem.trim()) {
-                       setWantedItems([...wantedItems, {name: newWantedItem.trim(), note: wantedItemNote.trim() || undefined}])
-                       setNewWantedItem('')
-                       setWantedItemNote('')
-                     }
-                   }}
-                   className="bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 hover:from-amber-700 hover:to-orange-700 transition-all duration-300 shadow-lg"
-                 >
-                   Přidat
-                 </Button>
-               </div>
-               <Input
-                 value={wantedItemNote}
-                 onChange={(e) => setWantedItemNote(e.target.value)}
-                 placeholder="Poznámka (volitelně)..."
-                 className="w-full bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 focus:bg-slate-700/50 transition-all duration-300"
-               />
+               )}
              </div>
 
               {/* Seznam wanted items */}
@@ -485,32 +665,34 @@ export default function EventPage({ params }: EventPageProps) {
                             <div className="text-slate-400 text-sm mt-1">📝 {item.note}</div>
                           )}
                         </div>
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => handleHaveItem(item.name)}
-                            variant="outline"
-                            size="sm"
-                            className="bg-slate-800/50 border border-green-400 text-green-400 hover:bg-green-600/20 hover:text-green-300 transition-all duration-300"
-                          >
-                            ✓ Mám
-                          </Button>
-                          <Button
-                            onClick={() => handleEditItem(index, item)}
-                            variant="outline"
-                            size="sm"
-                            className="bg-slate-800/50 border border-blue-400 text-blue-400 hover:bg-blue-600/20 hover:text-blue-300 transition-all duration-300"
-                          >
-                            ✏️
-                          </Button>
-                          <Button
-                            onClick={() => setWantedItems(wantedItems.filter((_, i) => i !== index))}
-                            variant="outline"
-                            size="sm"
-                            className="bg-slate-800/50 border border-red-400 text-red-400 hover:bg-red-600/20 hover:text-red-300 transition-all duration-300"
-                          >
-                            ✕
-                          </Button>
-                        </div>
+                        {!isReadOnly && (
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => handleHaveItem(item.name)}
+                              variant="outline"
+                              size="sm"
+                              className="bg-slate-800/50 border border-green-400 text-green-400 hover:bg-green-600/20 hover:text-green-300 transition-all duration-300"
+                            >
+                              ✓ Mám
+                            </Button>
+                            <Button
+                              onClick={() => handleEditItem(index, item)}
+                              variant="outline"
+                              size="sm"
+                              className="bg-slate-800/50 border border-blue-400 text-blue-400 hover:bg-blue-600/20 hover:text-blue-300 transition-all duration-300"
+                            >
+                              ✏️
+                            </Button>
+                            <Button
+                              onClick={() => setWantedItems(wantedItems.filter((_, i) => i !== index))}
+                              variant="outline"
+                              size="sm"
+                              className="bg-slate-800/50 border border-red-400 text-red-400 hover:bg-red-600/20 hover:text-red-300 transition-all duration-300"
+                            >
+                              ✕
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -568,17 +750,17 @@ export default function EventPage({ params }: EventPageProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8 items-start auto-rows-min [&>*:nth-child(odd)]:mb-0 [&>*:nth-child(even)]:mb-0 [&>*:nth-child(3)]:lg:col-start-1">
             {visibleSections.participants && (
               <div className="transform hover:scale-[1.01] transition-all duration-300">
-                <ParticipantsPanel eventToken={eventToken} />
+                <ParticipantsPanel eventToken={eventToken} isReadOnly={isReadOnly} />
               </div>
             )}
             {visibleSections.transport && (
               <div className="transform hover:scale-[1.01] transition-all duration-300">
-                <TransportPanel eventToken={eventToken} />
+                <TransportPanel eventToken={eventToken} isReadOnly={isReadOnly} />
               </div>
             )}
             {visibleSections.inventory && (
               <div className="transform hover:scale-[1.01] transition-all duration-300">
-                <InventoryPanel eventToken={eventToken} />
+                <InventoryPanel eventToken={eventToken} isReadOnly={isReadOnly} />
               </div>
             )}
           </div>

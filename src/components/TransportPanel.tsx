@@ -29,9 +29,10 @@ type TransportFormData = z.infer<typeof transportSchema>
 
 interface TransportPanelProps {
   eventToken: string
+  isReadOnly?: boolean
 }
 
-export function TransportPanel({ eventToken }: TransportPanelProps) {
+export function TransportPanel({ eventToken, isReadOnly = false }: TransportPanelProps) {
   const [transport, setTransport] = useState<any[]>([])
   const [participants, setParticipants] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -270,18 +271,20 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
           Správa dopravy a pasažérů
         </CardDescription>
           </div>
-          <Button className="border border-slate-500/30 text-slate-100 bg-slate-700/50 hover:bg-slate-600/50 hover:text-slate-100 hover:border-slate-400/50 transition-all duration-300 shadow-lg mr-6"
-            variant="outline"
-            size="sm"
-            onClick={() => setIsFormOpen(!isFormOpen)}
-          >
-            {isFormOpen ? <ChevronUp className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          </Button>
+          {!isReadOnly && (
+            <Button className="border border-slate-500/30 text-slate-100 bg-slate-700/50 hover:bg-slate-600/50 hover:text-slate-100 hover:border-slate-400/50 transition-all duration-300 shadow-lg mr-6"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsFormOpen(!isFormOpen)}
+            >
+              {isFormOpen ? <ChevronUp className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent className="p-6 pt-6 space-y-6">
         {/* Formulář pro přidávání */}
-        {isFormOpen && (
+        {isFormOpen && !isReadOnly && (
           <div className="mb-6 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-4">
@@ -497,24 +500,26 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
                         </p>
                       )}
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => editingId === transportItem.id ? handleCancelEdit() : handleEdit(transportItem)}
-                        className={editingId === transportItem.id ? "border-red-400 text-red-300 bg-slate-700/50 hover:bg-red-600/50 hover:text-white hover:border-red-400 transform hover:scale-105 transition-all duration-300 shadow-md" : "border-cyan-400 text-cyan-300 bg-slate-700/50 hover:bg-cyan-600/50 hover:text-white hover:border-cyan-400 transform hover:scale-105 transition-all duration-300 shadow-md"}
-                      >
-                        {editingId === transportItem.id ? "❌" : "✏️"}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(transportItem.id)}
-                        className="border-red-400 text-red-300 bg-slate-700/50 hover:bg-red-600/50 hover:text-white hover:border-red-400 transition-all duration-300 shadow-md"
-                      >
-                        🗑️
-                      </Button>
-                    </div>
+                    {!isReadOnly && (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => editingId === transportItem.id ? handleCancelEdit() : handleEdit(transportItem)}
+                          className={editingId === transportItem.id ? "border-red-400 text-red-300 bg-slate-700/50 hover:bg-red-600/50 hover:text-white hover:border-red-400 transform hover:scale-105 transition-all duration-300 shadow-md" : "border-cyan-400 text-cyan-300 bg-slate-700/50 hover:bg-cyan-600/50 hover:text-white hover:border-cyan-400 transform hover:scale-105 transition-all duration-300 shadow-md"}
+                        >
+                          {editingId === transportItem.id ? "❌" : "✏️"}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(transportItem.id)}
+                          className="border-red-400 text-red-300 bg-slate-700/50 hover:bg-red-600/50 hover:text-white hover:border-red-400 transition-all duration-300 shadow-md"
+                        >
+                          🗑️
+                        </Button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
