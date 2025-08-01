@@ -8,6 +8,7 @@ import { InventoryPanel } from '@/components/InventoryPanel'
 import { AuditLog } from '@/components/AuditLog'
 import { EditEventForm } from '@/components/EditEventForm'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface EventPageProps {
@@ -21,6 +22,17 @@ export default function EventPage({ params }: EventPageProps) {
   const [eventToken, setEventToken] = useState<string>('')
   const [participantsCount, setParticipantsCount] = useState<number>(0)
   const [paymentStatus, setPaymentStatus] = useState<'paid' | 'unpaid'>(event?.payment_status || 'unpaid')
+  const [wantedItems, setWantedItems] = useState<{name: string, note?: string}[]>([])
+  const [newWantedItem, setNewWantedItem] = useState<string>('')
+  const [showAssignModal, setShowAssignModal] = useState(false)
+  const [selectedWantedItem, setSelectedWantedItem] = useState<string>('')
+  const [selectedParticipant, setSelectedParticipant] = useState<string>('')
+  const [participants, setParticipants] = useState<any[]>([])
+  const [wantedItemNote, setWantedItemNote] = useState<string>('')
+  const [inventoryNote, setInventoryNote] = useState<string>('')
+  const [editingWantedItemIndex, setEditingWantedItemIndex] = useState<number | null>(null)
+  const [editItemName, setEditItemName] = useState<string>('')
+  const [editItemNote, setEditItemNote] = useState<string>('')
   
   // Filtr pro zobrazování sekcí
   const [visibleSections, setVisibleSections] = useState({
@@ -37,6 +49,7 @@ export default function EventPage({ params }: EventPageProps) {
       if (response.ok) {
         const participants = await response.json()
         setParticipantsCount(participants.length)
+        setParticipants(participants)
       }
     } catch (error) {
       console.error('Chyba při načítání počtu účastníků:', error)
@@ -60,6 +73,12 @@ export default function EventPage({ params }: EventPageProps) {
         
         // Načíst počet účastníků
         await loadParticipantsCount(token)
+        // Načíst účastníky pro modal
+        const participantsResponse = await fetch(`/api/events/${token}/participants`)
+        if (participantsResponse.ok) {
+          const participantsData = await participantsResponse.json()
+          setParticipants(participantsData)
+        }
       } catch (error) {
         console.error('Chyba při načítání události:', error)
         alert('Nepodařilo se načíst událost')
@@ -75,8 +94,18 @@ export default function EventPage({ params }: EventPageProps) {
   useEffect(() => {
     if (!eventToken) return
 
-    const interval = setInterval(() => {
-      loadParticipantsCount(eventToken)
+    const interval = setInterval(async () => {
+      await loadParticipantsCount(eventToken)
+      // Také aktualizovat seznam účastníků pro modal
+      try {
+        const response = await fetch(`/api/events/${eventToken}/participants`)
+        if (response.ok) {
+          const participantsData = await response.json()
+          setParticipants(participantsData)
+        }
+      } catch (error) {
+        console.error('Chyba při načítání účastníků:', error)
+      }
     }, 5000) // Kontrola každých 5 sekund
 
     return () => clearInterval(interval)
@@ -114,6 +143,79 @@ export default function EventPage({ params }: EventPageProps) {
       inventory: true,
       audit: false
     })
+  }
+
+  // Funkce pro přesun wanted item do inventáře
+  const moveToInventory = async () => {
+    if (!selectedWantedItem || !selectedParticipant) return
+
+    try {
+      const response = await fetch(`/api/events/${eventToken}/inventory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: selectedWantedItem,
+          quantity: 1,
+          assigned_to: selectedParticipant,
+          notes: `Přesunuto z WANTED${inventoryNote ? ` - ${inventoryNote}` : ''}`
+        }),
+      })
+
+      if (response.ok) {
+        // Odebrat z wanted items
+        setWantedItems(wantedItems.filter(item => item.name !== selectedWantedItem))
+        setShowAssignModal(false)
+        setSelectedWantedItem('')
+        setSelectedParticipant('')
+      }
+    } catch (error) {
+      console.error('Chyba při přesunu do inventáře:', error)
+      alert('Nepodařilo se přesunout do inventáře')
+    }
+  }
+
+  const handleHaveItem = async (item: string) => {
+    setSelectedWantedItem(item)
+    setShowAssignModal(true)
+    
+    // Načíst účastníky pro modal
+    try {
+      const response = await fetch(`/api/events/${eventToken}/participants`)
+      if (response.ok) {
+        const participantsData = await response.json()
+        setParticipants(participantsData)
+      }
+    } catch (error) {
+      console.error('Chyba při načítání účastníků:', error)
+    }
+  }
+
+  const handleEditItem = (index: number, item: {name: string, note?: string}) => {
+    setEditingWantedItemIndex(index)
+    setEditItemName(item.name)
+    setEditItemNote(item.note || '')
+  }
+
+  const handleSaveEdit = () => {
+    if (editingWantedItemIndex === null || !editItemName.trim()) return
+
+    setWantedItems(wantedItems.map((item, index) => 
+      index === editingWantedItemIndex 
+        ? { name: editItemName.trim(), note: editItemNote.trim() || undefined }
+        : item
+    ))
+    
+    setEditingWantedItemIndex(null)
+    setEditItemName('')
+    setEditItemNote('')
+  }
+
+  const handleCancelEdit = () => {
+    setEditingWantedItemIndex(null)
+    setEditItemName('')
+    setEditItemNote('')
   }
 
   if (isLoading) {
@@ -277,6 +379,152 @@ export default function EventPage({ params }: EventPageProps) {
           </CardContent>
         </Card>
 
+        {/* WANTED sekce */}
+        <div className="mb-8">
+          <Card className="border border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-2xl">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-xl font-bold text-amber-400 flex items-center gap-2">
+                🎯 WANTED
+              </CardTitle>
+              <CardDescription className="text-slate-300 text-sm">
+                Co potřebujeme sehnat pro tuto událost
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+                           {/* Přidání nového itemu */}
+             <div className="space-y-3 mb-4">
+               <div className="flex gap-3">
+                 <Input
+                   value={newWantedItem}
+                   onChange={(e) => setNewWantedItem(e.target.value)}
+                   placeholder="Napište co potřebujete sehnat..."
+                   className="flex-1 bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 focus:bg-slate-700/50 transition-all duration-300"
+                   onKeyPress={(e) => {
+                     if (e.key === 'Enter' && newWantedItem.trim()) {
+                       setWantedItems([...wantedItems, {name: newWantedItem.trim(), note: wantedItemNote.trim() || undefined}])
+                       setNewWantedItem('')
+                       setWantedItemNote('')
+                     }
+                   }}
+                 />
+                 <Button
+                   onClick={() => {
+                     if (newWantedItem.trim()) {
+                       setWantedItems([...wantedItems, {name: newWantedItem.trim(), note: wantedItemNote.trim() || undefined}])
+                       setNewWantedItem('')
+                       setWantedItemNote('')
+                     }
+                   }}
+                   className="bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 hover:from-amber-700 hover:to-orange-700 transition-all duration-300 shadow-lg"
+                 >
+                   Přidat
+                 </Button>
+               </div>
+               <Input
+                 value={wantedItemNote}
+                 onChange={(e) => setWantedItemNote(e.target.value)}
+                 placeholder="Poznámka (volitelně)..."
+                 className="w-full bg-slate-800/50 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 focus:bg-slate-700/50 transition-all duration-300"
+               />
+             </div>
+
+              {/* Seznam wanted items */}
+              <div className="space-y-2">
+                {wantedItems.map((item, index) => (
+                  <div key={index} className="bg-slate-800/30 border border-slate-600 rounded-lg">
+                    {editingWantedItemIndex === index ? (
+                      // Edit mode
+                      <div className="p-3 space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Název položky:
+                          </label>
+                          <Input
+                            value={editItemName}
+                            onChange={(e) => setEditItemName(e.target.value)}
+                            placeholder="Název položky..."
+                            className="w-full bg-slate-700 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-300 mb-2">
+                            Poznámka (volitelně):
+                          </label>
+                          <Input
+                            value={editItemNote}
+                            onChange={(e) => setEditItemNote(e.target.value)}
+                            placeholder="Poznámka..."
+                            className="w-full bg-slate-700 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={handleSaveEdit}
+                            disabled={!editItemName.trim()}
+                            size="sm"
+                            className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-0 hover:from-blue-700 hover:to-cyan-700 transition-all duration-300"
+                          >
+                            Uložit
+                          </Button>
+                          <Button
+                            onClick={handleCancelEdit}
+                            variant="outline"
+                            size="sm"
+                            className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300"
+                          >
+                            Zrušit
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      // View mode
+                      <div className="flex items-center justify-between p-3">
+                        <div className="flex-1">
+                          <span className="text-slate-200">🎯 {item.name}</span>
+                          {item.note && (
+                            <div className="text-slate-400 text-sm mt-1">📝 {item.note}</div>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleHaveItem(item.name)}
+                            variant="outline"
+                            size="sm"
+                            className="bg-slate-800/50 border border-green-400 text-green-400 hover:bg-green-600/20 hover:text-green-300 transition-all duration-300"
+                          >
+                            ✓ Mám
+                          </Button>
+                          <Button
+                            onClick={() => handleEditItem(index, item)}
+                            variant="outline"
+                            size="sm"
+                            className="bg-slate-800/50 border border-blue-400 text-blue-400 hover:bg-blue-600/20 hover:text-blue-300 transition-all duration-300"
+                          >
+                            ✏️
+                          </Button>
+                          <Button
+                            onClick={() => setWantedItems(wantedItems.filter((_, i) => i !== index))}
+                            variant="outline"
+                            size="sm"
+                            className="bg-slate-800/50 border border-red-400 text-red-400 hover:bg-red-600/20 hover:text-red-300 transition-all duration-300"
+                          >
+                            ✕
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {wantedItems.length === 0 && (
+                  <div className="text-center py-4 text-slate-400 text-sm">
+                    Zatím nejsou žádné položky na seznamu
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Filtr sekcí */}
         <div className="mb-8">
           <div className="grid grid-cols-4 gap-3">
@@ -319,17 +567,17 @@ export default function EventPage({ params }: EventPageProps) {
         {(visibleSections.participants || visibleSections.transport || visibleSections.inventory) && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8 items-start auto-rows-min [&>*:nth-child(odd)]:mb-0 [&>*:nth-child(even)]:mb-0 [&>*:nth-child(3)]:lg:col-start-1">
             {visibleSections.participants && (
-              <div className="transform hover:scale-[1.02] transition-all duration-300">
+              <div className="transform hover:scale-[1.01] transition-all duration-300">
                 <ParticipantsPanel eventToken={eventToken} />
               </div>
             )}
             {visibleSections.transport && (
-              <div className="transform hover:scale-[1.02] transition-all duration-300">
+              <div className="transform hover:scale-[1.01] transition-all duration-300">
                 <TransportPanel eventToken={eventToken} />
               </div>
             )}
             {visibleSections.inventory && (
-              <div className="transform hover:scale-[1.02] transition-all duration-300">
+              <div className="transform hover:scale-[1.01] transition-all duration-300">
                 <InventoryPanel eventToken={eventToken} />
               </div>
             )}
@@ -346,6 +594,73 @@ export default function EventPage({ params }: EventPageProps) {
             <p className="text-slate-400">Vyberte alespoň jednu sekci pro zobrazení</p>
           </div>
         )}
+
+        {/* Modal pro přiřazení účastníka */}
+        {showAssignModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-slate-800 border border-slate-600 rounded-xl p-6 max-w-md w-full mx-4">
+              <h3 className="text-xl font-bold text-white mb-4">
+                Přiřadit "{selectedWantedItem}" účastníkovi
+              </h3>
+              
+                              <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Vyberte účastníka:
+                    </label>
+                    <select
+                      value={selectedParticipant}
+                      onChange={(e) => setSelectedParticipant(e.target.value)}
+                      className="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    >
+                      <option value="">-- Vyberte účastníka --</option>
+                      {participants.map((participant) => (
+                        <option key={participant.id} value={participant.id}>
+                          {participant.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Poznámka (volitelně):
+                    </label>
+                    <Input
+                      value={inventoryNote}
+                      onChange={(e) => setInventoryNote(e.target.value)}
+                      placeholder="Přidat poznámku k položce..."
+                      className="w-full bg-slate-700 border border-slate-600 text-slate-100 placeholder-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={moveToInventory}
+                      disabled={!selectedParticipant}
+                      className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0 hover:from-green-700 hover:to-emerald-700 transition-all duration-300"
+                    >
+                      Přesunout do inventáře
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowAssignModal(false)
+                        setSelectedWantedItem('')
+                        setSelectedParticipant('')
+                        setInventoryNote('')
+                      }}
+                      variant="outline"
+                      className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300"
+                    >
+                      Zrušit
+                    </Button>
+                  </div>
+                </div>
+            </div>
+          </div>
+        )}
+
+
       </div>
     </div>
   )
