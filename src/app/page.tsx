@@ -1,7 +1,23 @@
+'use client'
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
+  const handleConnect = () => {
+    // Získat hash z URL
+    const urlParams = new URLSearchParams(window.location.search)
+    const hash = urlParams.get('hash')
+    
+    if (hash) {
+      // Přesměrovat na connect stránku s hashem
+      window.location.href = `/connect?hash=${hash}`
+    } else {
+      // Přesměrovat na connect stránku bez hashe
+      window.location.href = '/connect'
+    }
+  }
+
   return (
     <div className="min-h-screen text-white">
       {/* Hero Section */}
@@ -30,13 +46,11 @@ export default function Home() {
               </Button>
               <Button 
                 size="lg" 
+                onClick={handleConnect}
                 className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white px-10 py-6 text-lg font-semibold shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 border-0"
-                asChild
               >
-                <a href="/join">
-                  <span className="mr-3">🔗</span>
-                  Připojit se
-                </a>
+                <span className="mr-3">🔗</span>
+                Připojit se
               </Button>
             </div>
           </div>
