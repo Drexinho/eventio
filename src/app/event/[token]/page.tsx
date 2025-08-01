@@ -19,6 +19,8 @@ export default function EventPage({ params }: EventPageProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [eventToken, setEventToken] = useState<string>('')
+  const [participantsCount, setParticipantsCount] = useState<number>(0)
+  const [paymentStatus, setPaymentStatus] = useState<'paid' | 'unpaid'>(event?.payment_status || 'unpaid')
   
   // Filtr pro zobrazování sekcí
   const [visibleSections, setVisibleSections] = useState({
@@ -27,6 +29,19 @@ export default function EventPage({ params }: EventPageProps) {
     inventory: true,
     audit: false // Historie změn je skrytá podle požadavku
   })
+
+  // Funkce pro načítání počtu účastníků
+  const loadParticipantsCount = async (token: string) => {
+    try {
+      const response = await fetch(`/api/events/${token}/participants`)
+      if (response.ok) {
+        const participants = await response.json()
+        setParticipantsCount(participants.length)
+      }
+    } catch (error) {
+      console.error('Chyba při načítání počtu účastníků:', error)
+    }
+  }
 
   useEffect(() => {
     const loadEvent = async () => {
@@ -41,6 +56,10 @@ export default function EventPage({ params }: EventPageProps) {
         
         const eventData = await response.json()
         setEvent(eventData)
+        setPaymentStatus(eventData.payment_status || 'unpaid')
+        
+        // Načíst počet účastníků
+        await loadParticipantsCount(token)
       } catch (error) {
         console.error('Chyba při načítání události:', error)
         alert('Nepodařilo se načíst událost')
@@ -52,6 +71,17 @@ export default function EventPage({ params }: EventPageProps) {
     loadEvent()
   }, [params])
 
+  // Automatické aktualizování počtu účastníků
+  useEffect(() => {
+    if (!eventToken) return
+
+    const interval = setInterval(() => {
+      loadParticipantsCount(eventToken)
+    }, 5000) // Kontrola každých 5 sekund
+
+    return () => clearInterval(interval)
+  }, [eventToken])
+
   const handleEditSuccess = () => {
     setIsEditing(false)
     // Znovu načíst událost
@@ -61,6 +91,7 @@ export default function EventPage({ params }: EventPageProps) {
         if (response.ok) {
           const eventData = await response.json()
           setEvent(eventData)
+          setPaymentStatus(eventData.payment_status || 'unpaid')
         }
       } catch (error) {
         console.error('Chyba při načítání události:', error)
@@ -149,7 +180,7 @@ export default function EventPage({ params }: EventPageProps) {
               <Button 
                 variant="outline" 
                 onClick={() => setIsEditing(true)}
-                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0 shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
+                className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
               >
                 ✏️ Upravit
               </Button>
@@ -158,60 +189,87 @@ export default function EventPage({ params }: EventPageProps) {
           <CardContent>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Levý sloupec - informace */}
-              <div className="space-y-6">
+              <div className="space-y-6 flex flex-col h-full">
                 {event.description && (
                   <p className="text-slate-300 text-lg leading-relaxed">{event.description}</p>
                 )}
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-slate-800/50 border border-slate-700 rounded-2xl">
-                    <p className="text-sm text-slate-400 mb-1">Maximální počet účastníků</p>
-                    <p className="text-2xl font-bold text-cyan-400">{event.max_participants}</p>
-                  </div>
-                  <div className="text-center p-4 bg-slate-800/50 border border-slate-700 rounded-2xl">
-                    <p className="text-sm text-slate-400 mb-1">Cena celkem</p>
-                    <p className="text-2xl font-bold text-blue-400">{event.price} Kč</p>
-                  </div>
-                </div>
-
-                <div className="text-center p-4 bg-slate-800/50 border border-slate-700 rounded-2xl">
-                  <p className="text-sm text-slate-400 mb-1">Cena na jednoho</p>
-                  <p className="text-2xl font-bold text-purple-400">{Math.ceil(event.price / Math.max(event.max_participants, 1))} Kč</p>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  {event.map_link && (
-                    <Button asChild variant="outline" className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-cyan-500 transition-all duration-300 transform hover:scale-105">
-                      <a href={event.map_link} target="_blank" rel="noopener noreferrer">
-                        🗺️ Mapa
-                      </a>
-                    </Button>
-                  )}
+                <div className="text-center p-4 bg-slate-800/50 border border-slate-700 rounded-2xl flex flex-col items-center justify-end mt-auto relative overflow-hidden">
+                  <p className="text-sm text-slate-200 mb-1 relative z-10">Maximální počet účastníků</p>
+                  <p className="text-2xl font-bold text-cyan-400 relative z-10">{event.max_participants}</p>
+                  <p className="text-xs text-slate-300 mt-1 relative z-10">Aktuálně: {participantsCount}</p>
                   
-                  {event.booking_link && (
-                    <Button asChild variant="outline" className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-cyan-500 transition-all duration-300 transform hover:scale-105">
-                      <a href={event.booking_link} target="_blank" rel="noopener noreferrer">
-                        🏰 Odkaz na ubytování
-                      </a>
-                    </Button>
-                  )}
+                  {/* Fill effect */}
+                  <div 
+                    className="absolute bottom-0 left-0 right-0 bg-cyan-400/8 transition-all duration-1000 ease-out"
+                    style={{ 
+                      height: `${Math.min((participantsCount / event.max_participants) * 100, 100)}%`
+                    }}
+                  ></div>
                 </div>
               </div>
 
               {/* Pravý sloupec - obrázek */}
               {event.image_url && (
                 <div className="flex justify-center lg:justify-end">
-                  <div className="relative group">
-                    <img 
-                      src={event.image_url} 
-                      alt={event.name}
-                      className="w-full max-w-2xl h-auto rounded-2xl shadow-2xl group-hover:shadow-cyan-500/25 transition-all duration-500 transform group-hover:scale-105"
-                      style={{ width: '100%' }}
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none'
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="w-full max-w-2xl flex flex-col h-full">
+                    <div className="relative group">
+                      <div className="w-full aspect-[16/12] rounded-2xl shadow-2xl overflow-hidden bg-slate-800/20">
+                        <img 
+                          src={event.image_url} 
+                          alt={event.name}
+                          className="w-full h-full object-cover group-hover:shadow-cyan-500/25 transition-all duration-500 transform group-hover:scale-105"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none'
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </div>
+                    </div>
+                    
+                    {/* Pevná mezera pod obrázkem */}
+                    <div className="h-8"></div>
+                    
+                    {/* Tlačítka a ceny od spodu */}
+                    <div className="mt-auto space-y-6 mt-8">
+                      {/* Tlačítka */}
+                      <div className="flex flex-row gap-3">
+                        {event.booking_link && (
+                          <Button asChild variant="outline" className="flex-1 bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg py-3">
+                            <a href={event.booking_link} target="_blank" rel="noopener noreferrer">
+                              🏰 Odkaz na ubytování
+                            </a>
+                          </Button>
+                        )}
+                        
+                        {event.map_link && (
+                          <Button asChild variant="outline" className="flex-1 bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg py-3">
+                            <a href={event.map_link} target="_blank" rel="noopener noreferrer">
+                              🗺️ Lokace ubytování
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Ceny */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="text-center p-4 bg-slate-800/50 border border-slate-700 rounded-2xl flex flex-col items-center justify-end">
+                          <p className="text-sm text-slate-200 mb-1">Cena na jednoho při naplnění kapacity</p>
+                          <p className="text-2xl font-bold text-purple-400">{Math.round(event.price / Math.max(event.max_participants, 1))} Kč</p>
+                          <p className="text-sm text-slate-200 mt-1">Aktuálně: {participantsCount > 0 ? Math.round(event.price / participantsCount) : 0} Kč</p>
+                        </div>
+                        <div className="text-center p-4 bg-slate-800/50 border border-slate-700 rounded-2xl flex flex-col items-center justify-end">
+                          <p className="text-sm text-slate-200 mb-1">Cena celkem</p>
+                          <p className="text-2xl font-bold text-blue-400">{Math.round(event.price)} Kč</p>
+                          <p className="text-sm text-slate-200 mt-1">
+                            Stav: {paymentStatus === 'paid' ? 
+                              <span className="text-green-400">✓ Zaplaceno</span> : 
+                              <span className="text-red-400">✗ Nezaplaceno</span>
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -226,7 +284,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.participants && visibleSections.transport && visibleSections.inventory ? "default" : "outline"}
               size="sm"
               onClick={showAll}
-              className={`w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0 shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 py-4 ${(visibleSections.participants && visibleSections.transport && visibleSections.inventory) ? 'border-b-4 border-gradient-to-r from-cyan-500 to-blue-500' : ''}`}
+              className={`w-full bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg py-4 ${(visibleSections.participants && visibleSections.transport && visibleSections.inventory) ? 'border-b-4 border-cyan-400' : ''}`}
             >
               Všechno
             </Button>
@@ -234,7 +292,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.participants ? "default" : "outline"}
               size="sm"
               onClick={() => toggleSection('participants')}
-              className={`w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 py-4 ${visibleSections.participants ? 'border-b-4 border-gradient-to-r from-blue-500 to-purple-500' : ''}`}
+              className={`w-full bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg py-4 ${visibleSections.participants ? 'border-b-4 border-cyan-400' : ''}`}
             >
               👥 Účastníci
             </Button>
@@ -242,7 +300,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.transport ? "default" : "outline"}
               size="sm"
               onClick={() => toggleSection('transport')}
-              className={`w-full bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white border-0 shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 py-4 ${visibleSections.transport ? 'border-b-4 border-gradient-to-r from-purple-500 to-cyan-500' : ''}`}
+              className={`w-full bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg py-4 ${visibleSections.transport ? 'border-b-4 border-cyan-400' : ''}`}
             >
               🚗 Doprava
             </Button>
@@ -250,7 +308,7 @@ export default function EventPage({ params }: EventPageProps) {
               variant={visibleSections.inventory ? "default" : "outline"}
               size="sm"
               onClick={() => toggleSection('inventory')}
-              className={`w-full bg-gradient-to-r from-cyan-500 to-green-500 hover:from-cyan-600 hover:to-green-600 text-white border-0 shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 py-4 ${visibleSections.inventory ? 'border-b-4 border-gradient-to-r from-cyan-500 to-green-500' : ''}`}
+              className={`w-full bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg py-4 ${visibleSections.inventory ? 'border-b-4 border-cyan-400' : ''}`}
             >
               📦 Inventář
             </Button>

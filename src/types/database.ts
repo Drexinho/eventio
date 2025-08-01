@@ -11,6 +11,7 @@ export interface Event {
   map_link: string | null
   booking_link: string | null
   image_url: string | null
+  payment_status: 'paid' | 'unpaid'
   created_at: string
   updated_at: string
 }

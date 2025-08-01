@@ -87,6 +87,17 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
     loadData()
   }, [eventToken])
 
+  // Automatické aktualizování dat
+  useEffect(() => {
+    if (!eventToken) return
+
+    const interval = setInterval(() => {
+      loadData()
+    }, 3000) // Kontrola každých 3 sekund
+
+    return () => clearInterval(interval)
+  }, [eventToken])
+
   const onSubmit = async (data: TransportFormData) => {
     setIsAdding(true)
     try {
@@ -255,9 +266,9 @@ export function TransportPanel({ eventToken }: TransportPanelProps) {
               </div>
               Doprava
             </CardTitle>
-            <CardDescription className="text-slate-300 mt-0.5 text-sm">
-              Organizace dopravy
-            </CardDescription>
+                    <CardDescription className="text-slate-300 mt-0.5 text-sm">
+          Správa dopravy a pasažérů
+        </CardDescription>
           </div>
           <Button className="border border-slate-500/30 text-slate-100 bg-slate-700/50 hover:bg-slate-600/50 hover:text-slate-100 hover:border-slate-400/50 transition-all duration-300 shadow-lg mr-6"
             variant="outline"

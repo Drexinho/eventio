@@ -20,7 +20,8 @@ const editEventSchema = z.object({
   price: z.number().min(0, 'Cena nemůže být záporná'),
   map_link: z.string().optional(),
   booking_link: z.string().optional(),
-  image_url: z.string().optional()
+  image_url: z.string().optional(),
+  payment_status: z.enum(['paid', 'unpaid'])
 })
 
 type EditEventFormData = z.infer<typeof editEventSchema>
@@ -49,7 +50,8 @@ export function EditEventForm({ event, eventToken, onSuccess }: EditEventFormPro
       price: event.price,
       map_link: event.map_link || '',
       booking_link: event.booking_link || '',
-      image_url: event.image_url || ''
+      image_url: event.image_url || '',
+      payment_status: event.payment_status || 'unpaid'
     }
   })
 
@@ -70,7 +72,8 @@ export function EditEventForm({ event, eventToken, onSuccess }: EditEventFormPro
           price: data.price,
           map_link: data.map_link || null,
           booking_link: data.booking_link || null,
-          image_url: data.image_url || null
+          image_url: data.image_url || null,
+          payment_status: data.payment_status
         }),
       })
 
@@ -216,6 +219,21 @@ export function EditEventForm({ event, eventToken, onSuccess }: EditEventFormPro
             </p>
             {errors.image_url && (
               <p className="text-sm text-red-500">{errors.image_url.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="payment_status">Stav zaplacení</Label>
+            <select
+              id="payment_status"
+              {...register('payment_status')}
+              className="w-full px-3 py-2 border border-slate-600 rounded-md bg-slate-800 text-slate-100"
+            >
+              <option value="unpaid">Nezaplaceno</option>
+              <option value="paid">Zaplaceno</option>
+            </select>
+            {errors.payment_status && (
+              <p className="text-sm text-red-500">{errors.payment_status.message}</p>
             )}
           </div>
 

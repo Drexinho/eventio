@@ -74,6 +74,17 @@ export function InventoryPanel({ eventToken }: InventoryPanelProps) {
     loadData()
   }, [eventToken])
 
+  // Automatické aktualizování dat
+  useEffect(() => {
+    if (!eventToken) return
+
+    const interval = setInterval(() => {
+      loadData()
+    }, 3000) // Kontrola každých 3 sekund
+
+    return () => clearInterval(interval)
+  }, [eventToken])
+
   const onSubmit = async (data: InventoryFormData) => {
     setIsAdding(true)
     try {

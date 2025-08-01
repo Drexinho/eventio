@@ -4,8 +4,8 @@ import type { Event, Participant, Transport, InventoryItem, AuditLog } from '@/t
 // Event funkce
 export const createEvent = async (eventData: Omit<Event, 'id' | 'created_at'>) => {
   const result = await query(`
-    INSERT INTO events (name, description, start_date, end_date, max_participants, price, access_type, access_token, map_link, booking_link, image_url)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    INSERT INTO events (name, description, start_date, end_date, max_participants, price, access_type, access_token, map_link, booking_link, image_url, payment_status)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
     RETURNING *
   `, [
     eventData.name,
@@ -18,7 +18,8 @@ export const createEvent = async (eventData: Omit<Event, 'id' | 'created_at'>) =
     eventData.access_token,
     eventData.map_link,
     eventData.booking_link,
-    eventData.image_url
+    eventData.image_url,
+    eventData.payment_status || 'unpaid'
   ])
   return result.rows[0]
 }
