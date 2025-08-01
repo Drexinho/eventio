@@ -476,21 +476,21 @@ export default function EventPage({ params }: EventPageProps) {
         {/* Hero Card */}
         <Card className="mb-8 border border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-2xl">
           <CardHeader>
-            <div className="flex justify-between items-start">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
               <div>
-                <CardTitle className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">
+                <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2 mobile-text-xl">
                   {event.name}
                 </CardTitle>
-                <CardDescription className="text-lg text-slate-300">
+                <CardDescription className="text-base sm:text-lg text-slate-300 mobile-text-base">
                   📅 {new Date(event.start_date).toLocaleDateString('cs-CZ')} - {new Date(event.end_date).toLocaleDateString('cs-CZ')}
                 </CardDescription>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 {!isReadOnly ? (
                   <Button 
                     variant="outline" 
                     onClick={() => setIsEditing(true)}
-                    className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                    className="w-full sm:w-auto bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg mobile-button"
                   >
                     ✏️ Upravit
                   </Button>
@@ -503,7 +503,7 @@ export default function EventPage({ params }: EventPageProps) {
                       setPinError('')
                       setPinAttempts(0)
                     }}
-                    className="bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                    className="w-full sm:w-auto bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg mobile-button"
                   >
                     🔓 Zadat PIN pro edit
                   </Button>
@@ -512,11 +512,11 @@ export default function EventPage({ params }: EventPageProps) {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
               {/* Levý sloupec - informace */}
               <div className="space-y-6 flex flex-col h-full">
                 {event.description && (
-                  <p className="text-slate-300 text-lg leading-relaxed">{event.description}</p>
+                  <p className="text-slate-300 text-base sm:text-lg leading-relaxed mobile-text-base">{event.description}</p>
                 )}
 
                 <div className="text-center p-4 bg-slate-800/50 border border-slate-700 rounded-2xl flex flex-col items-center justify-end mt-auto relative overflow-hidden">
@@ -537,7 +537,7 @@ export default function EventPage({ params }: EventPageProps) {
               {/* Pravý sloupec - obrázek */}
               {event.image_url && (
                 <div className="flex justify-center lg:justify-end">
-                  <div className="w-full max-w-2xl flex flex-col h-full">
+                  <div className="w-full max-w-2xl flex flex-col h-full mobile-container">
                     <div className="relative group">
                       <div className="w-full aspect-[16/12] rounded-2xl shadow-2xl overflow-hidden bg-slate-800/20">
                         <img 
@@ -558,9 +558,9 @@ export default function EventPage({ params }: EventPageProps) {
                     {/* Tlačítka a ceny od spodu */}
                     <div className="mt-auto space-y-6 mt-8">
                       {/* Tlačítka */}
-                      <div className="flex flex-row gap-3">
+                      <div className="flex flex-col md:flex-row gap-3">
                         {event.booking_link && (
-                          <Button asChild variant="outline" className="flex-1 bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg py-3">
+                          <Button asChild variant="outline" className="w-full md:flex-1 bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg py-3 mobile-button">
                             <a href={event.booking_link} target="_blank" rel="noopener noreferrer">
                               🏰 Odkaz na ubytování
                             </a>
@@ -568,7 +568,7 @@ export default function EventPage({ params }: EventPageProps) {
                         )}
                         
                         {event.map_link && (
-                          <Button asChild variant="outline" className="flex-1 bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg py-3">
+                          <Button asChild variant="outline" className="w-full md:flex-1 bg-slate-800/50 border border-slate-600 text-slate-300 hover:bg-gradient-to-r hover:from-slate-700/80 hover:to-slate-600/80 hover:border-slate-500 hover:text-slate-100 transition-all duration-300 transform hover:scale-105 hover:shadow-lg py-3 mobile-button">
                             <a href={event.map_link} target="_blank" rel="noopener noreferrer">
                               🗺️ Lokace ubytování
                             </a>
@@ -577,7 +577,7 @@ export default function EventPage({ params }: EventPageProps) {
                       </div>
 
                       {/* Ceny */}
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div className="text-center p-4 bg-slate-800/50 border border-slate-700 rounded-2xl flex flex-col items-center justify-end">
                           <p className="text-sm text-slate-200 mb-1">Cena na jednoho při naplnění kapacity</p>
                           <p className="text-2xl font-bold text-purple-400">{Math.round(event.price / Math.max(event.max_participants, 1))} Kč</p>

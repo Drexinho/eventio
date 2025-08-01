@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import MobileNavigation from "@/components/MobileNavigation";
 
 export default function Home() {
   const handleConnect = () => {
@@ -22,21 +23,21 @@ export default function Home() {
     <div className="min-h-screen text-white">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="relative container mx-auto px-4 py-20">
+        <div className="relative container mx-auto px-4 py-20 mobile-hero">
           <div className="text-center mb-16">
             <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-8 shadow-2xl">
               <span className="text-4xl">⚡</span>
             </div>
-            <h1 className="text-7xl font-bold mb-8 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <h1 className="text-7xl font-bold mb-8 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mobile-hero">
               EventPlanner
             </h1>
-            <p className="text-2xl text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-2xl text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed mobile-hero">
               Futuristický plánovač událostí pro <span className="text-cyan-400 font-semibold">moderní skupiny</span>
             </p>
-            <div className="flex gap-6 justify-center mb-12">
+            <div className="flex gap-6 justify-center mb-12 mobile-buttons">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-10 py-6 text-lg font-semibold shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 border-0"
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-10 py-6 text-lg font-semibold shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 border-0 mobile-button"
                 asChild
               >
                 <a href="/create">
@@ -47,7 +48,7 @@ export default function Home() {
               <Button 
                 size="lg" 
                 onClick={handleConnect}
-                className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white px-10 py-6 text-lg font-semibold shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 border-0"
+                className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600 text-white px-10 py-6 text-lg font-semibold shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 border-0 mobile-button"
               >
                 <span className="mr-3">🔗</span>
                 Připojit se
@@ -68,8 +69,8 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mobile-card-grid">
+          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm mobile-card">
             <CardHeader className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                 <span className="text-3xl">⚡</span>
@@ -88,7 +89,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
+          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm mobile-card">
             <CardHeader className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                 <span className="text-3xl">🔄</span>
@@ -107,7 +108,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
+          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm mobile-card">
             <CardHeader className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                 <span className="text-3xl">🔒</span>
@@ -161,6 +162,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+      
+      {/* Mobilní navigace */}
+      <MobileNavigation />
     </div>
   );
 }
