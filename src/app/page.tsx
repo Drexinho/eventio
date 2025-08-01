@@ -150,8 +150,7 @@ export default function Home() {
             </Button>
             <Button 
               size="lg" 
-              variant="outline"
-              className="border-slate-600 text-white hover:bg-slate-700 px-12 py-6 text-xl font-semibold transition-all duration-300 transform hover:scale-105"
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-12 py-6 text-xl font-semibold shadow-2xl hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-105 border-0"
               asChild
             >
               <a href="/event/THwjrZbQiPZrAXwfkaah">
