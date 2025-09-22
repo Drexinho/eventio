@@ -11,9 +11,6 @@ const nextConfig: NextConfig = {
         tls: false,
         dns: false,
         pg: false,
-        'pg-native': false,
-        'pg-query-stream': false,
-        'pg-pool': false,
       };
     } else {
       // On server side, provide proper fallbacks for pg module
@@ -24,7 +21,10 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
-  serverExternalPackages: ['pg', 'pg-native'],
+  serverExternalPackages: ['pg'],
+  experimental: {
+    serverComponentsExternalPackages: ['pg'],
+  },
 };
 
 export default nextConfig;

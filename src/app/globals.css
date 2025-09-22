@@ -564,3 +564,10 @@
     }
   }
 }
+
+/* Explicitně zakázat blur efekt na inventáři a všech panelech */
+.no-blur, .no-blur * {
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+

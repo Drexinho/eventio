@@ -171,7 +171,7 @@ export function ParticipantsPanel({ eventToken, isReadOnly = false }: Participan
   }
 
   return (
-    <Card className="bg-gradient-to-br from-slate-800/30 via-slate-700/40 to-slate-900/50 backdrop-blur-md border border-slate-600/30 shadow-2xl">
+    <Card className="bg-gradient-to-br from-slate-800/30 via-slate-700/40 to-slate-900/50 no-blur  border border-slate-600/30 shadow-2xl">
       <CardHeader className="border-b border-slate-600/40 py-1 px-2">
         <div className="flex justify-between items-center pl-3">
           <div>
@@ -199,7 +199,7 @@ export function ParticipantsPanel({ eventToken, isReadOnly = false }: Participan
       <CardContent className="p-6 pt-6 space-y-6">
         {/* Formulář pro přidávání */}
         {isFormOpen && !isReadOnly && (
-          <div className="mb-6 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl">
+          <div className="mb-6 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30  shadow-xl">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-slate-100">Jméno *</Label>
@@ -246,7 +246,7 @@ export function ParticipantsPanel({ eventToken, isReadOnly = false }: Participan
           {participants.map((participant) => (
             <div key={participant.id}>
               {/* Účastník */}
-              <div className="flex justify-between items-center py-3 px-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl hover:shadow-slate-500/25 transition-all duration-300">
+              <div className="flex justify-between items-center py-3 px-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30  shadow-xl hover:shadow-slate-500/25 transition-all duration-300">
                 <div className="flex-1">
                   <p className="font-medium text-slate-100">{participant.name}</p>
                   <p className="text-sm text-slate-100">
@@ -282,7 +282,7 @@ export function ParticipantsPanel({ eventToken, isReadOnly = false }: Participan
 
               {/* Editační formulář inline */}
               {editingId === participant.id && (
-                <div className="mt-4 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl">
+                <div className="mt-4 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30  shadow-xl">
                   <h3 className="font-medium mb-4 text-slate-100">Upravit účastníka</h3>
                   <form onSubmit={handleSubmit(handleSaveEdit)} className="space-y-4">
                     <div className="space-y-2">

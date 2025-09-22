@@ -33,13 +33,6 @@ interface EditEventFormProps {
 }
 
 export function EditEventForm({ event, eventToken, onSuccess }: EditEventFormProps) {
-
-  // Funkce pro převod data do formátu YYYY-MM-DD pro HTML input
-  const formatDateForInput = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toISOString().split("T")[0]
-  }
-
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
@@ -51,8 +44,8 @@ export function EditEventForm({ event, eventToken, onSuccess }: EditEventFormPro
     defaultValues: {
       name: event.name,
       description: event.description || '',
-      start_date: formatDateForInput(event.start_date),
-      end_date: formatDateForInput(event.end_date),
+      start_date: event.start_date,
+      end_date: event.end_date,
       max_participants: event.max_participants,
       price: event.price,
       map_link: event.map_link || '',

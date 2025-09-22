@@ -374,8 +374,8 @@ export default function EventPage({ params }: EventPageProps) {
     <div className="min-h-screen">
       {/* PIN Modal */}
       {showPinModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md border border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-2xl">
+        <div className="fixed inset-0 bg-black/80  flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md border border-slate-800 bg-slate-900/50  shadow-2xl">
             <CardHeader className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-4 shadow-xl">
                 <span className="text-2xl">🔒</span>
@@ -474,7 +474,7 @@ export default function EventPage({ params }: EventPageProps) {
 
       <div className="container mx-auto p-4">
         {/* Hero Card */}
-        <Card className="mb-8 border border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-2xl">
+        <Card className="mb-8 border border-slate-800 bg-slate-900/50  shadow-2xl">
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
               <div>
@@ -516,7 +516,7 @@ export default function EventPage({ params }: EventPageProps) {
               {/* Levý sloupec - informace */}
               <div className="space-y-6 flex flex-col h-full">
                 {event.description && (
-                  <p className="text-slate-300 text-base sm:text-lg leading-relaxed mobile-text-base">{event.description}</p>
+                  <div className="text-slate-300 text-base sm:text-lg leading-relaxed mobile-text-base whitespace-pre-wrap">{event.description}</div>
                 )}
 
                 <div className="text-center p-4 bg-slate-800/50 border border-slate-700 rounded-2xl flex flex-col items-center justify-end mt-auto relative overflow-hidden">
@@ -604,7 +604,7 @@ export default function EventPage({ params }: EventPageProps) {
 
         {/* WANTED sekce */}
         <div className="mb-8">
-          <Card className="border border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-2xl">
+          <Card className="border border-slate-800 bg-slate-900/50  shadow-2xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-xl font-bold text-amber-400 flex items-center gap-2">
                 🎯 WANTED

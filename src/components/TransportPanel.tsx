@@ -257,7 +257,7 @@ export function TransportPanel({ eventToken, isReadOnly = false }: TransportPane
   }
 
   return (
-    <Card className="bg-gradient-to-br from-slate-800/30 via-slate-700/40 to-slate-900/50 backdrop-blur-md border border-slate-600/30 shadow-2xl">
+    <Card className="bg-gradient-to-br from-slate-800/30 via-slate-700/40 to-slate-900/50 no-blur  border border-slate-600/30 shadow-2xl">
       <CardHeader className="border-b border-slate-600/40 py-1 px-2">
         <div className="flex justify-between items-center pl-3">
           <div>
@@ -285,7 +285,7 @@ export function TransportPanel({ eventToken, isReadOnly = false }: TransportPane
       <CardContent className="p-6 pt-6 space-y-6">
         {/* Formulář pro přidávání */}
         {isFormOpen && !isReadOnly && (
-          <div className="mb-6 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl">
+          <div className="mb-6 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30  shadow-xl">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -448,7 +448,7 @@ export function TransportPanel({ eventToken, isReadOnly = false }: TransportPane
             return (
                               <div key={transportItem.id}>
                   {/* Doprava */}
-                  <div className="border border-slate-600/30 rounded-xl p-6 bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl hover:shadow-slate-500/25 transition-all duration-300 relative">
+                  <div className="border border-slate-600/30 rounded-xl p-6 bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30  shadow-xl hover:shadow-slate-500/25 transition-all duration-300 relative">
                     {/* Razítko "NAPLNĚNO" když je kapacita naplněna */}
                     {assignedCount >= transportItem.capacity && transportItem.capacity > 0 && (
                       <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -523,19 +523,19 @@ export function TransportPanel({ eventToken, isReadOnly = false }: TransportPane
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-                    <div className="text-center p-4 bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-purple-500/10 rounded-xl border border-cyan-500/20 backdrop-blur-sm shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 flex flex-col items-center justify-center group">
+                    <div className="text-center p-4 bg-gradient-to-br from-cyan-500/10 via-blue-500/10 to-purple-500/10 rounded-xl border border-cyan-500/20  shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 flex flex-col items-center justify-center group">
                       <p className="text-xs text-cyan-300 mb-2 font-medium">Kapacita</p>
                       <p className="font-bold text-cyan-100 text-xl group-hover:text-cyan-50 transition-colors">{transportItem.capacity}</p>
                     </div>
-                    <div className="text-center p-4 bg-gradient-to-br from-green-500/10 via-emerald-500/10 to-teal-500/10 rounded-xl border border-green-500/20 backdrop-blur-sm shadow-lg hover:shadow-green-500/25 transition-all duration-300 flex flex-col items-center justify-center group">
+                    <div className="text-center p-4 bg-gradient-to-br from-green-500/10 via-emerald-500/10 to-teal-500/10 rounded-xl border border-green-500/20  shadow-lg hover:shadow-green-500/25 transition-all duration-300 flex flex-col items-center justify-center group">
                       <p className="text-xs text-green-300 mb-2 font-medium">Přiřazeno</p>
                       <p className="font-bold text-green-100 text-xl group-hover:text-green-50 transition-colors">{assignedCount}</p>
                     </div>
-                    <div className="text-center p-4 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-yellow-500/10 rounded-xl border border-orange-500/20 backdrop-blur-sm shadow-lg hover:shadow-orange-500/25 transition-all duration-300 flex flex-col items-center justify-center group">
+                    <div className="text-center p-4 bg-gradient-to-br from-orange-500/10 via-amber-500/10 to-yellow-500/10 rounded-xl border border-orange-500/20  shadow-lg hover:shadow-orange-500/25 transition-all duration-300 flex flex-col items-center justify-center group">
                       <p className="text-xs text-orange-300 mb-2 font-medium">Cena celkem</p>
                       <p className="font-bold text-orange-100 text-xl group-hover:text-orange-50 transition-colors">{Math.round(transportItem.price)} Kč</p>
                     </div>
-                    <div className={`text-center p-4 rounded-xl backdrop-blur-sm shadow-lg transition-all duration-500 flex flex-col items-center justify-center group ${
+                    <div className={`text-center p-4 rounded-xl  shadow-lg transition-all duration-500 flex flex-col items-center justify-center group ${
                       assignedCount >= transportItem.capacity && transportItem.capacity > 0
                         ? "bg-gradient-to-br from-green-500/20 via-emerald-500/20 to-teal-500/20 border border-green-400/40 shadow-green-500/30 hover:shadow-green-400/40 animate-pulse"
                         : "bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-rose-500/10 border border-purple-500/20 hover:shadow-purple-500/25"
@@ -593,7 +593,7 @@ export function TransportPanel({ eventToken, isReadOnly = false }: TransportPane
 
                 {/* Editační formulář inline */}
                 {editingId === transportItem.id && (
-                  <div className="mt-4 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30 backdrop-blur-sm shadow-xl">
+                  <div className="mt-4 p-6 border border-slate-600/30 rounded-xl bg-gradient-to-r from-slate-700/30 via-slate-600/40 to-slate-800/30  shadow-xl">
                     <h3 className="font-medium mb-4 text-slate-100">Upravit dopravu</h3>
                     <form onSubmit={handleSubmit(handleSaveEdit)} className="space-y-4">
                       <div className="space-y-4">

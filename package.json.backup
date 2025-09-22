@@ -4,10 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "dev:custom": "node server.js",
     "build": "next build",
     "start": "next start",
-    "start:custom": "NODE_ENV=production node server.js",
     "lint": "next lint"
   },
   "dependencies": {
