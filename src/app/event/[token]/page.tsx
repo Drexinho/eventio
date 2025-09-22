@@ -516,7 +516,7 @@ export default function EventPage({ params }: EventPageProps) {
               {/* Levý sloupec - informace */}
               <div className="space-y-6 flex flex-col h-full">
                 {event.description && (
-                  <div className="text-slate-300 text-base sm:text-lg leading-relaxed mobile-text-base whitespace-pre-wrap">{event.description}</div>
+                  <div className="text-slate-300 text-base sm:text-lg leading-relaxed mobile-text-base whitespace-pre-wrap text-format-preserve">{event.description}</div>
                 )}
 
                 <div className="text-center p-4 bg-slate-800/50 border border-slate-700 rounded-2xl flex flex-col items-center justify-end mt-auto relative overflow-hidden">

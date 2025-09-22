@@ -590,3 +590,18 @@
   white-space: pre-wrap !important;
 }
 
+
+/* Silné pravidlo pro zachování formátování textu */
+.text-format-preserve {
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Alternativně pro všechny elementy s whitespace-pre-wrap */
+.whitespace-pre-wrap {
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
