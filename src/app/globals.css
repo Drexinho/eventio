@@ -584,3 +584,9 @@
   filter: none !important;
 }
 
+
+/* Zachovat formátování textu */
+.whitespace-pre-wrap {
+  white-space: pre-wrap !important;
+}
+
