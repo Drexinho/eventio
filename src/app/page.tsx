@@ -70,7 +70,7 @@ export default function Home() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mobile-card-grid">
-          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm mobile-card">
+          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50  mobile-card">
             <CardHeader className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                 <span className="text-3xl">⚡</span>
@@ -89,7 +89,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm mobile-card">
+          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50  mobile-card">
             <CardHeader className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                 <span className="text-3xl">🔄</span>
@@ -108,7 +108,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50 backdrop-blur-sm mobile-card">
+          <Card className="group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-slate-800 bg-slate-900/50  mobile-card">
             <CardHeader className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                 <span className="text-3xl">🔒</span>

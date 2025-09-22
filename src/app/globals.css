@@ -180,7 +180,7 @@
 /* Glass morphism efekt */
 .glass {
   background: rgba(15, 23, 42, 0.1);
-  backdrop-filter: blur(10px);
+  
   border: 1px solid rgba(51, 65, 85, 0.2);
 }
 
@@ -302,7 +302,7 @@
     left: 0;
     right: 0;
     background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(20px);
+    
     border-top: 1px solid rgba(51, 65, 85, 0.3);
     z-index: 1000;
     padding: 0.75rem 1rem;
@@ -567,6 +567,19 @@
 
 /* Explicitně zakázat blur efekt na inventáři a všech panelech */
 .no-blur, .no-blur * {
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+
+/* ÚPLNĚ ZAKÁZAT VŠECHNY BLUR EFEKTY */
+*, *::before, *::after {
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Speciálně pro všechny karty a panely */
+.Card, .card, [class*="Card"], [class*="card"] {
   backdrop-filter: none !important;
   filter: none !important;
 }

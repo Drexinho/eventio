@@ -57,7 +57,7 @@ export default function JoinEventPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <Card className="border border-slate-800 bg-slate-900/50 backdrop-blur-sm shadow-2xl">
+        <Card className="border border-slate-800 bg-slate-900/50  shadow-2xl">
           <CardHeader className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mb-4 shadow-xl">
               <span className="text-2xl">🔗</span>

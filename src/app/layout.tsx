@@ -28,9 +28,9 @@ export default function RootLayout({
         <div className="min-h-screen bg-black text-white relative overflow-hidden">
           {/* Globální pozadí */}
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-black to-slate-900"></div>
-          <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-8 left-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full "></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full "></div>
+          <div className="absolute -bottom-8 left-20 w-96 h-96 bg-cyan-500/10 rounded-full "></div>
           
           {/* Obsah */}
           <div className="relative z-10">
